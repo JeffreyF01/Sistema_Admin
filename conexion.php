@@ -4,7 +4,7 @@ $port = 3306;
 
 $user = "root";
 $pass = "";
-$db   = "sistema_ventas";
+$db   = "sitema_admin";
 
 $conexion = new mysqli($host, $user, $pass, $db, $port);
 
