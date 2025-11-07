@@ -11,7 +11,6 @@ include "includes/sidebar.php";
 ?>
 
 <div class="main-content">
-    <!-- Header de página -->
     <div class="main-header">
         <div class="container-fluid">
             <div class="row align-items-center">
@@ -38,7 +37,6 @@ include "includes/sidebar.php";
 
     <div class="content-area">
         <div class="container-fluid">
-            <!-- Tarjeta de Formulario -->
             <div class="row justify-content-center">
                 <div class="col-lg-10">
                     <div class="card card-custom fade-in">
@@ -54,7 +52,6 @@ include "includes/sidebar.php";
                                         <label class="form-label text-required">Nombre del Movimiento</label>
                                         <input type="text" name="nombre" class="form-control form-control-custom" required 
                                                placeholder="Ej: Entrada por Compra, Salida por Venta">
-                                  
                                     </div>
                                     <div class="col-md-6">
                                         <label class="form-label text-required">Clase</label>
@@ -63,7 +60,6 @@ include "includes/sidebar.php";
                                             <option value="ENTRADA">🟢 ENTRADA</option>
                                             <option value="SALIDA">🔴 SALIDA</option>
                                         </select>
-                                     
                                     </div>
                                 </div>
 
@@ -72,7 +68,6 @@ include "includes/sidebar.php";
                                         <label class="form-label">Descripción</label>
                                         <textarea name="descripcion" class="form-control form-control-custom" rows="3" 
                                                   placeholder="Descripción detallada del tipo de movimiento..."></textarea>
-                                       
                                     </div>
                                 </div>
 
@@ -83,7 +78,6 @@ include "includes/sidebar.php";
                                             <option value="1">🟢 Activo</option>
                                             <option value="0">🔴 Inactivo</option>
                                         </select>
-                                      
                                     </div>
                                 </div>
 
@@ -96,7 +90,6 @@ include "includes/sidebar.php";
                 </div>
             </div>
 
-            <!-- Tarjeta de Listado -->
             <div class="row justify-content-center mt-4">
                 <div class="col-12">
                     <div class="card card-custom fade-in">
@@ -141,13 +134,11 @@ function cargarMovimientos(){
 }
 
 function editarMovimiento(id, nombre, clase, descripcion, activo){
-    // Llenar formulario con datos para editar
     $("input[name='nombre']").val(nombre);
     $("select[name='clase']").val(clase);
     $("textarea[name='descripcion']").val(descripcion);
     $("select[name='activo']").val(activo);
     
-    // Scroll suave al formulario
     $('html, body').animate({
         scrollTop: $(".card-custom").first().offset().top - 20
     }, 500);
@@ -156,7 +147,6 @@ function editarMovimiento(id, nombre, clase, descripcion, activo){
 $("#formMovimientos").on("submit", function(e){
     e.preventDefault();
 
-    // Mostrar loading
     const submitBtn = $(this).find('button[type="submit"]');
     const originalText = submitBtn.html();
     submitBtn.html('<i class="fas fa-spinner fa-spin me-2"></i>Guardando...');
@@ -167,7 +157,6 @@ $("#formMovimientos").on("submit", function(e){
         type: "POST",
         data: $(this).serialize(),
         success: function(res){
-            // Restaurar botón
             submitBtn.html(originalText);
             submitBtn.prop('disabled', false);
 
@@ -190,7 +179,6 @@ $("#formMovimientos").on("submit", function(e){
             }
         },
         error: function(){
-            // Restaurar botón en caso de error
             submitBtn.html(originalText);
             submitBtn.prop('disabled', false);
             Swal.fire({
@@ -203,7 +191,6 @@ $("#formMovimientos").on("submit", function(e){
     });
 });
 
-// Cargar movimientos al iniciar
 $(document).ready(function(){
     cargarMovimientos();
 });
