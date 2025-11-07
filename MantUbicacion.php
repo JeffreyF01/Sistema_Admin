@@ -54,14 +54,14 @@ include "includes/sidebar.php";
                                         <label class="form-label text-required">Código de Ubicación</label>
                                         <input type="text" name="codigo" class="form-control form-control-custom" required 
                                                placeholder="Ej: UBI-001">
-                                        <small class="form-text text-muted">Código único identificador</small>
+                                        
                                     </div>
 
                                     <div class="col-md-8 mb-4">
                                         <label class="form-label text-required">Nombre de la Ubicación</label>
                                         <input type="text" name="nombre" class="form-control form-control-custom" required 
                                                placeholder="Ej: Estantería A - Nivel 1">
-                                        <small class="form-text text-muted">Nombre descriptivo de la ubicación</small>
+                                       
                                     </div>
                                 </div>
 
@@ -77,16 +77,16 @@ include "includes/sidebar.php";
                                             }
                                             ?>
                                         </select>
-                                        <small class="form-text text-muted">Almacén al que pertenece esta ubicación</small>
+                                     
                                     </div>
 
                                     <div class="col-md-6 mb-4">
                                         <label class="form-label text-required">Estado</label>
                                         <select name="activo" class="form-control form-control-custom" required>
-                                            <option value="1">🟢 Activo - Disponible para uso</option>
-                                            <option value="0">🔴 Inactivo - No disponible</option>
+                                            <option value="1">🟢 Activo</option>
+                                            <option value="0">🔴 Inactivo</option>
                                         </select>
-                                        <small class="form-text text-muted">Estado de la ubicación en el sistema</small>
+                                   
                                     </div>
                                 </div>
 

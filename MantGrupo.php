@@ -61,14 +61,14 @@ include "includes/sidebar.php";
                                             }
                                             ?>
                                         </select>
-                                        <small class="form-text text-muted">Departamento al que pertenece el grupo</small>
+                                       
                                     </div>
 
                                     <div class="col-md-6 mb-4">
                                         <label class="form-label text-required">Nombre del Grupo</label>
                                         <input type="text" name="nombre" class="form-control form-control-custom" required 
                                                placeholder="Ej: Laptops, Smartphones, Accesorios">
-                                        <small class="form-text text-muted">Nombre descriptivo del grupo</small>
+                                     
                                     </div>
                                 </div>
 
@@ -76,10 +76,10 @@ include "includes/sidebar.php";
                                     <div class="col-md-4 mb-4">
                                         <label class="form-label text-required">Estado</label>
                                         <select name="activo" class="form-control form-control-custom" required>
-                                            <option value="1">🟢 Activo - Disponible</option>
-                                            <option value="0">🔴 Inactivo - No disponible</option>
+                                            <option value="1">🟢 Activo</option>
+                                            <option value="0">🔴 Inactivo</option>
                                         </select>
-                                        <small class="form-text text-muted">Estado del grupo en el sistema</small>
+                                     
                                     </div>
                                 </div>
 

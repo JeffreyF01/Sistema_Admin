@@ -51,12 +51,12 @@ include "includes/sidebar.php";
                                 <div class="col-lg-6 col-md-6 mb-4">  <!-- Ajusté columnas -->
                                     <label class="form-label text-required fs-5">Código del Almacén</label>  <!-- fs-5 para texto más grande -->
                                     <input type="text" name="codigo" class="form-control form-control-custom fs-6" required 
-                                           placeholder="Ingrese el código único del almacén (Ej: ALM-001)">
+                                           placeholder="(Ej: ALM-001)">
                                 </div>
                                 <div class="col-lg-6 col-md-6 mb-4">
                                     <label class="form-label text-required fs-5">Nombre del Almacén</label>
                                     <input type="text" name="nombre" class="form-control form-control-custom fs-6" required 
-                                           placeholder="Ingrese el nombre descriptivo (Ej: Almacén Principal)">
+                                           placeholder="(Ej: Almacén Principal)">
                                 </div>
                             </div>
                             
@@ -65,8 +65,8 @@ include "includes/sidebar.php";
                                     <label class="form-label text-required fs-5">Estado del Almacén</label>
                                     <select name="activo" class="form-control form-control-custom fs-6" required>
                                         <option value="">Seleccione el estado del almacén</option>
-                                        <option value="1">🟢 Activo - Disponible para uso</option>
-                                        <option value="0">🔴 Inactivo - No disponible</option>
+                                        <option value="1">🟢 Activo</option>
+                                        <option value="0">🔴 Inactivo</option>
                                     </select>
                                 </div>
                             </div>
