@@ -156,7 +156,7 @@ if (isset($conexion) && $conexion instanceof mysqli) {
     }
 
     .submenu.show {
-        max-height: 300px;
+        max-height: 500px; /* Más alto para todos los items */
     }
 
     .submenu-link {
@@ -476,7 +476,8 @@ if (isset($conexion) && $conexion instanceof mysqli) {
                 <span>Mantenimientos</span>
                 <i class="fa-solid fa-chevron-down ms-auto" id="mantenimientosArrow"></i>
             </a>
-            <div class="submenu" id="mantenimientosMenu">
+            <!-- CAMBIO 1: Agregar 'show' para que esté expandido por defecto -->
+            <div class="submenu show" id="mantenimientosMenu">
                 <a href="Mantproductos.php" class="submenu-link">
                     <i class="fa-solid fa-box"></i>
                     <span>Productos</span>
@@ -652,6 +653,10 @@ if (isset($conexion) && $conexion instanceof mysqli) {
                     <i class="fa-solid fa-plus"></i>
                     <span>Nuevo Producto</span>
                 </a>
+                <a href="MantAlmacen.php" class="action-btn">
+                    <i class="fa-solid fa-warehouse"></i>
+                    <span>Nuevo Almacén</span>
+                </a>
             </div>
         </div>
     </div>
@@ -662,6 +667,10 @@ document.addEventListener('DOMContentLoaded', function() {
     const mantenimientosBtn = document.getElementById('mantenimientosBtn');
     const mantenimientosMenu = document.getElementById('mantenimientosMenu');
     const mantenimientosArrow = document.getElementById('mantenimientosArrow');
+
+    // CAMBIO 2: Inicialmente expandido en dashboard
+    mantenimientosMenu.classList.add('show');
+    mantenimientosArrow.classList.add('fa-rotate-180');
 
     mantenimientosBtn.addEventListener('click', function(e) {
         e.preventDefault();
