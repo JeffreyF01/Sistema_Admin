@@ -714,7 +714,6 @@ document.addEventListener('DOMContentLoaded', function() {
         arrow.classList.remove('fa-rotate-180');
     }
     
-    console.log('✅ Submenú forzado a estado CERRADO');
 });
 </script>
 </body>
