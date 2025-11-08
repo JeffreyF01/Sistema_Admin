@@ -476,7 +476,7 @@ if (isset($conexion) && $conexion instanceof mysqli) {
                 <span>Mantenimientos</span>
                 <i class="fa-solid fa-chevron-down ms-auto" id="mantenimientosArrow"></i>
             </a>
-            <!-- CAMBIO 1: Agregar 'show' para que esté expandido por defecto -->
+    
             <div class="submenu show" id="mantenimientosMenu">
                 <a href="Mantproductos.php" class="submenu-link">
                     <i class="fa-solid fa-box"></i>
