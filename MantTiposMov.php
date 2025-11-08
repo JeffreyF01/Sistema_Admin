@@ -37,25 +37,36 @@ include "includes/sidebar.php";
 
     <div class="content-area">
         <div class="container-fluid">
-            <div class="row justify-content-center">
-                <div class="col-lg-10">
-                    <div class="card card-custom fade-in">
-                        <div class="card-header card-header-custom">
-                            <h5 class="mb-0">
-                                <i class="fas fa-plus-circle me-2"></i>Registro de Tipos de Movimiento
-                            </h5>
+            <!-- Botón para abrir modal de Tipos de Movimiento -->
+            <div class="row mb-3">
+                <div class="col-12 d-flex justify-content-end">
+                    <button id="btnAbrirModalMovimiento" type="button" class="btn btn-primary-custom">
+                        <i class="fas fa-plus-circle me-2"></i>Añadir Tipo de Movimiento
+                    </button>
+                </div>
+            </div>
+
+            <!-- Modal: Formulario de Tipos de Movimiento -->
+            <div class="modal fade" id="modalMovimiento" tabindex="-1" aria-labelledby="modalMovimientoLabel" aria-hidden="true">
+                <div class="modal-dialog modal-lg modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="modalMovimientoLabel"><i class="fas fa-plus-circle me-2"></i>Registro de Tipos de Movimiento</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                         </div>
-                        <div class="card-body">
+                        <div class="modal-body">
                             <form id="formMovimientos" class="form-mantenimiento">
+                                <input type="hidden" name="id_tipos_movimiento" id="id_tipos_movimiento">
+
                                 <div class="row mb-4">
                                     <div class="col-md-6">
                                         <label class="form-label text-required">Nombre del Movimiento</label>
-                                        <input type="text" name="nombre" class="form-control form-control-custom" required 
+                                        <input type="text" name="nombre" id="nombre" class="form-control form-control-custom" required 
                                                placeholder="Ej: Entrada por Compra, Salida por Venta">
                                     </div>
                                     <div class="col-md-6">
                                         <label class="form-label text-required">Clase</label>
-                                        <select name="clase" class="form-control form-control-custom" required>
+                                        <select name="clase" id="clase" class="form-control form-control-custom" required>
                                             <option value="">Seleccione la clase...</option>
                                             <option value="ENTRADA">🟢 ENTRADA</option>
                                             <option value="SALIDA">🔴 SALIDA</option>
@@ -66,7 +77,7 @@ include "includes/sidebar.php";
                                 <div class="row mb-4">
                                     <div class="col-12">
                                         <label class="form-label">Descripción</label>
-                                        <textarea name="descripcion" class="form-control form-control-custom" rows="3" 
+                                        <textarea name="descripcion" id="descripcion" class="form-control form-control-custom" rows="3" 
                                                   placeholder="Descripción detallada del tipo de movimiento..."></textarea>
                                     </div>
                                 </div>
@@ -74,16 +85,18 @@ include "includes/sidebar.php";
                                 <div class="row">
                                     <div class="col-md-4 mb-4">
                                         <label class="form-label text-required">Estado</label>
-                                        <select name="activo" class="form-control form-control-custom" required>
+                                        <select name="activo" id="activo" class="form-control form-control-custom" required>
                                             <option value="1">🟢 Activo</option>
                                             <option value="0">🔴 Inactivo</option>
                                         </select>
                                     </div>
                                 </div>
 
-                                <button type="submit" class="btn btn-primary-custom btn-custom w-100">
-                                    <i class="fas fa-save me-2"></i>Guardar Tipo de Movimiento
-                                </button>
+                                <div class="d-flex justify-content-end mt-2">
+                                    <button type="submit" class="btn btn-primary-custom btn-custom">
+                                        <i class="fas fa-save me-2"></i>Guardar Tipo de Movimiento
+                                    </button>
+                                </div>
                             </form>
                         </div>
                     </div>
@@ -134,14 +147,15 @@ function cargarMovimientos(){
 }
 
 function editarMovimiento(id, nombre, clase, descripcion, activo){
-    $("input[name='nombre']").val(nombre);
-    $("select[name='clase']").val(clase);
-    $("textarea[name='descripcion']").val(descripcion);
-    $("select[name='activo']").val(activo);
-    
-    $('html, body').animate({
-        scrollTop: $(".card-custom").first().offset().top - 20
-    }, 500);
+    $("#id_tipos_movimiento").val(id);
+    $("#nombre").val(nombre);
+    $("#clase").val(clase);
+    $("#descripcion").val(descripcion);
+    $("#activo").val(activo);
+
+    // Mostrar modal para editar
+    var modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('modalMovimiento'));
+    modal.show();
 }
 
 $("#formMovimientos").on("submit", function(e){
@@ -160,14 +174,18 @@ $("#formMovimientos").on("submit", function(e){
             submitBtn.html(originalText);
             submitBtn.prop('disabled', false);
 
-            if(res == "ok"){
+            if(res.trim() == "ok"){
                 Swal.fire({
                     title: "✅ Éxito",
                     text: "Tipo de movimiento registrado correctamente",
                     icon: "success",
                     confirmButtonColor: "#004aad"
                 });
+                // Cerrar modal y limpiar formulario
+                var modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('modalMovimiento'));
+                modal.hide();
                 $("#formMovimientos")[0].reset();
+                $("#id_tipos_movimiento").val('');
                 cargarMovimientos();
             } else {
                 Swal.fire({
@@ -193,6 +211,16 @@ $("#formMovimientos").on("submit", function(e){
 
 $(document).ready(function(){
     cargarMovimientos();
+});
+</script>
+
+<script>
+// Abrir modal para añadir nuevo
+$(document).on('click', '#btnAbrirModalMovimiento', function(){
+    $("#formMovimientos")[0].reset();
+    $("#id_tipos_movimiento").val('');
+    var modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('modalMovimiento'));
+    modal.show();
 });
 </script>
 

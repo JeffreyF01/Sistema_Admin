@@ -38,37 +38,45 @@ include "includes/sidebar.php";
 
     <div class="content-area">
         <div class="container-fluid">
-            <div class="row justify-content-center">
-                <div class="col-lg-10">
-                    <div class="card card-custom fade-in">
-                        <div class="card-header card-header-custom">
-                            <h5 class="mb-0">
-                                <i class="fas fa-plus-circle me-2"></i>Registro de Ubicaciones
-                            </h5>
+            <!-- Botón para abrir modal (añadir) -->
+            <div class="row mb-3">
+                <div class="col-12 d-flex justify-content-end">
+                    <button id="btnAbrirModalUbicacion" type="button" class="btn btn-primary-custom">
+                        <i class="fas fa-plus-circle me-2"></i>Añadir Ubicación
+                    </button>
+                </div>
+            </div>
+
+            <!-- Modal: Formulario de Ubicaciones -->
+            <div class="modal fade" id="modalUbicacion" tabindex="-1" aria-labelledby="modalUbicacionLabel" aria-hidden="true">
+                <div class="modal-dialog modal-lg modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="modalUbicacionLabel"><i class="fas fa-plus-circle me-2"></i>Registro de Ubicaciones</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                         </div>
-                        <div class="card-body">
+                        <div class="modal-body">
                             <form id="formUbicacion" class="form-mantenimiento">
-                                
+                                <input type="hidden" name="id_ubicaciones" id="id_ubicaciones">
+
                                 <div class="row">
                                     <div class="col-md-4 mb-4">
                                         <label class="form-label text-required">Código de Ubicación</label>
-                                        <input type="text" name="codigo" class="form-control form-control-custom" required 
+                                        <input type="text" name="codigo" id="codigo" class="form-control form-control-custom" required 
                                                placeholder="Ej: UBI-001">
-                                        
                                     </div>
 
                                     <div class="col-md-8 mb-4">
                                         <label class="form-label text-required">Nombre de la Ubicación</label>
-                                        <input type="text" name="nombre" class="form-control form-control-custom" required 
+                                        <input type="text" name="nombre" id="nombre" class="form-control form-control-custom" required 
                                                placeholder="Ej: Estantería A - Nivel 1">
-                                       
                                     </div>
                                 </div>
 
                                 <div class="row">
                                     <div class="col-md-6 mb-4">
                                         <label class="form-label text-required">Almacén</label>
-                                        <select name="id_almacen" class="form-control form-control-custom" required>
+                                        <select name="id_almacen" id="id_almacen" class="form-control form-control-custom" required>
                                             <option value="">Seleccione un almacén...</option>
                                             <?php
                                             $sql = $conexion->query("SELECT id_almacen, nombre FROM almacen WHERE activo = 1 ORDER BY nombre");
@@ -77,23 +85,18 @@ include "includes/sidebar.php";
                                             }
                                             ?>
                                         </select>
-                                     
                                     </div>
 
                                     <div class="col-md-6 mb-4">
                                         <label class="form-label text-required">Estado</label>
-                                        <select name="activo" class="form-control form-control-custom" required>
+                                        <select name="activo" id="activo" class="form-control form-control-custom" required>
                                             <option value="1">🟢 Activo</option>
                                             <option value="0">🔴 Inactivo</option>
                                         </select>
-                                   
                                     </div>
                                 </div>
 
-                                <div class="d-flex justify-content-between align-items-center mt-4 pt-3 border-top">
-                                    <a href="dashboard.php" class="btn btn-secondary-custom btn-custom">
-                                        <i class="fas fa-arrow-left me-2"></i>
-                                    </a>
+                                <div class="d-flex justify-content-end mt-2">
                                     <button type="submit" class="btn btn-primary-custom btn-custom">
                                         <i class="fas fa-save me-2"></i>Guardar Ubicación
                                     </button>
@@ -103,11 +106,72 @@ include "includes/sidebar.php";
                     </div>
                 </div>
             </div>
+
+            <!-- Tabla de Ubicaciones -->
+            <div class="row justify-content-center mt-4">
+                <div class="col-12">
+                    <div class="card card-custom fade-in">
+                        <div class="card-header card-header-custom">
+                            <h5 class="mb-0">
+                                <i class="fas fa-list me-2"></i>Lista de Ubicaciones
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-mantenimiento">
+                                    <thead>
+                                        <tr>
+                                            <th width="8%">ID</th>
+                                            <th width="20%">Código</th>
+                                            <th width="35%">Nombre</th>
+                                            <th width="20%">Almacén</th>
+                                            <th width="10%">Estado</th>
+                                            <th width="7%">Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tablaUbicaciones"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
 <script>
+function cargarUbicaciones(){
+    $.ajax({
+        url: "Ubicacion_listar.php",
+        type: "GET",
+        success: function(data){
+            $("#tablaUbicaciones").html(data);
+        }
+    });
+}
+
+function editar(id, codigo, nombre, id_alm, activo){
+    // Rellenar campos
+    $("#id_ubicaciones").val(id);
+    $("#codigo").val(codigo);
+    $("#nombre").val(nombre);
+    $("#id_almacen").val(id_alm);
+    $("#activo").val(activo);
+
+    // Abrir modal
+    var modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('modalUbicacion'));
+    modal.show();
+}
+
+// Abrir modal para añadir nuevo
+$(document).on('click', '#btnAbrirModalUbicacion', function(){
+    $("#formUbicacion")[0].reset();
+    $("#id_ubicaciones").val('');
+    var modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('modalUbicacion'));
+    modal.show();
+});
+
 $("#formUbicacion").on("submit", function(e){
     e.preventDefault();
 
@@ -133,7 +197,12 @@ $("#formUbicacion").on("submit", function(e){
                     icon: "success",
                     confirmButtonColor: "#004aad"
                 });
+                // Cerrar modal, limpiar y recargar tabla
+                var modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('modalUbicacion'));
+                modal.hide();
                 $("#formUbicacion")[0].reset();
+                $("#id_ubicaciones").val('');
+                cargarUbicaciones();
             } else {
                 Swal.fire({
                     title: "❌ Error",
@@ -155,6 +224,11 @@ $("#formUbicacion").on("submit", function(e){
             });
         }
     });
+});
+
+// Cargar ubicaciones al iniciar
+$(document).ready(function(){
+    cargarUbicaciones();
 });
 </script>
 

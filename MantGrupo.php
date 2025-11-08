@@ -38,21 +38,31 @@ include "includes/sidebar.php";
 
     <div class="content-area">
         <div class="container-fluid">
-            <!-- Tarjeta de Formulario -->
-            <div class="row justify-content-center">
-                <div class="col-lg-8">
-                    <div class="card card-custom fade-in">
-                        <div class="card-header card-header-custom">
-                            <h5 class="mb-0">
-                                <i class="fas fa-plus-circle me-2"></i>Registro de Grupos
-                            </h5>
+            <!-- Botón para abrir modal de registro -->
+            <div class="row mb-3">
+                <div class="col-12 d-flex justify-content-end">
+                    <button id="btnAbrirModalGrupo" type="button" class="btn btn-primary-custom">
+                        <i class="fas fa-plus-circle me-2"></i>Añadir Grupo
+                    </button>
+                </div>
+            </div>
+
+            <!-- Modal: Formulario de Grupos -->
+            <div class="modal fade" id="modalGrupo" tabindex="-1" aria-labelledby="modalGrupoLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="modalGrupoLabel"><i class="fas fa-plus-circle me-2"></i>Registro de Grupos</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                         </div>
-                        <div class="card-body">
+                        <div class="modal-body">
                             <form id="formGrupos" class="form-mantenimiento">
+                                <input type="hidden" name="id_grupos" id="id_grupos">
+
                                 <div class="row">
                                     <div class="col-md-6 mb-4">
                                         <label class="form-label text-required">Departamento</label>
-                                        <select name="departamento_id" class="form-control form-control-custom" required>
+                                        <select name="departamento_id" id="departamento_id" class="form-control form-control-custom" required>
                                             <option value="">Seleccione un departamento...</option>
                                             <?php
                                             $sql = $conexion->query("SELECT id_departamentos, nombre FROM departamento WHERE activo = 1 ORDER BY nombre");
@@ -61,25 +71,22 @@ include "includes/sidebar.php";
                                             }
                                             ?>
                                         </select>
-                                       
                                     </div>
 
                                     <div class="col-md-6 mb-4">
                                         <label class="form-label text-required">Nombre del Grupo</label>
-                                        <input type="text" name="nombre" class="form-control form-control-custom" required 
+                                        <input type="text" name="nombre" id="nombre" class="form-control form-control-custom" required 
                                                placeholder="Ej: Laptops, Smartphones, Accesorios">
-                                     
                                     </div>
                                 </div>
 
                                 <div class="row">
                                     <div class="col-md-4 mb-4">
                                         <label class="form-label text-required">Estado</label>
-                                        <select name="activo" class="form-control form-control-custom" required>
+                                        <select name="activo" id="activo" class="form-control form-control-custom" required>
                                             <option value="1">🟢 Activo</option>
                                             <option value="0">🔴 Inactivo</option>
                                         </select>
-                                     
                                     </div>
                                 </div>
 
@@ -109,7 +116,8 @@ include "includes/sidebar.php";
                                             <th width="10%">ID</th>
                                             <th width="35%">Departamento</th>
                                             <th width="35%">Grupo</th>
-                                            <th width="20%">Estado</th>
+                                                    <th width="20%">Estado</th>
+                                                    <th width="10%">Acciones</th>
                                         </tr>
                                     </thead>
                                     <tbody id="tablaGrupos"></tbody>
@@ -133,8 +141,24 @@ function cargarGrupos(){
         }
     });
 }
+        function editar(id, departamento_id, nombre, activo){
+            $("#id_grupos").val(id);
+            $("#departamento_id").val(departamento_id);
+            $("#nombre").val(nombre);
+            $("#activo").val(activo);
+            var modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('modalGrupo'));
+            modal.show();
+        }
 
-$("#formGrupos").on("submit", function(e){
+        // Abrir modal para añadir
+        $(document).on('click', '#btnAbrirModalGrupo', function(){
+            $("#formGrupos")[0].reset();
+            $("#id_grupos").val('');
+            var modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('modalGrupo'));
+            modal.show();
+        });
+
+        $("#formGrupos").on("submit", function(e){
     e.preventDefault();
 
     // Mostrar loading
@@ -152,14 +176,17 @@ $("#formGrupos").on("submit", function(e){
             submitBtn.html(originalText);
             submitBtn.prop('disabled', false);
 
-            if(res == "ok"){
+            if(res.trim() == "ok"){
                 Swal.fire({
                     title: "✅ Éxito",
                     text: "Grupo registrado correctamente",
                     icon: "success",
                     confirmButtonColor: "#004aad"
                 });
+                var modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('modalGrupo'));
+                modal.hide();
                 $("#formGrupos")[0].reset();
+                $("#id_grupos").val('');
                 cargarGrupos();
             } else {
                 Swal.fire({

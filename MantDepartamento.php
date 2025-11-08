@@ -38,16 +38,24 @@ include "includes/sidebar.php";
 
     <div class="content-area">
         <div class="container-fluid">
-            <!-- Tarjeta de Formulario -->
-            <div class="row justify-content-center">
-                <div class="col-lg-8">
-                    <div class="card card-custom fade-in">
-                        <div class="card-header card-header-custom">
-                            <h5 class="mb-0">
-                                <i class="fas fa-plus-circle me-2"></i>Registro de Departamentos
-                            </h5>
+            <!-- Botón para abrir el formulario en modal -->
+            <div class="row mb-3">
+                <div class="col-12 d-flex justify-content-end">
+                    <button id="btnAbrirModal" type="button" class="btn btn-primary-custom">
+                        <i class="fas fa-plus-circle me-2"></i>Añadir Departamento
+                    </button>
+                </div>
+            </div>
+
+            <!-- Modal: Formulario de Departamentos (oculto por defecto) -->
+            <div class="modal fade" id="modalDepartamentos" tabindex="-1" aria-labelledby="modalDepartamentosLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="modalDepartamentosLabel"><i class="fas fa-plus-circle me-2"></i>Registro de Departamentos</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                         </div>
-                        <div class="card-body">
+                        <div class="modal-body">
                             <form id="formDepartamentos" class="form-mantenimiento">
                                 <input type="hidden" name="id_departamentos" id="id_departamentos">
 
@@ -122,12 +130,18 @@ function editar(id, nombre, activo){
     $("#id_departamentos").val(id);
     $("#nombre").val(nombre);
     $("#activo").val(activo);
-    
-    // Scroll suave al formulario
-    $('html, body').animate({
-        scrollTop: $(".card-custom").first().offset().top - 20
-    }, 500);
+    // Abrir modal con el formulario para editar
+    var modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('modalDepartamentos'));
+    modal.show();
 }
+
+// Abrir modal para añadir nuevo departamento y limpiar el formulario
+$(document).on('click', '#btnAbrirModal', function(){
+    $("#formDepartamentos")[0].reset();
+    $("#id_departamentos").val('');
+    var modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('modalDepartamentos'));
+    modal.show();
+});
 
 $("#formDepartamentos").on("submit", function(e){
     e.preventDefault();
@@ -154,6 +168,9 @@ $("#formDepartamentos").on("submit", function(e){
                     icon: "success",
                     confirmButtonColor: "#004aad"
                 });
+                // Cerrar modal y limpiar formulario
+                var modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('modalDepartamentos'));
+                modal.hide();
                 $("#formDepartamentos")[0].reset();
                 $("#id_departamentos").val("");
                 cargarDepartamentos();
