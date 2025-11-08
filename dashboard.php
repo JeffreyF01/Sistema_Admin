@@ -156,7 +156,7 @@ if (isset($conexion) && $conexion instanceof mysqli) {
     }
 
     .submenu.show {
-        max-height: 500px; /* Más alto para todos los items */
+        max-height: 500px;
     }
 
     .submenu-link {
@@ -449,6 +449,22 @@ if (isset($conexion) && $conexion instanceof mysqli) {
         color: var(--dark);
         font-size: 1.1rem;
     }
+    #mantenimientosMenu:not(.show) {
+        max-height: 0 !important;
+        overflow: hidden !important;
+    }
+    
+    #mantenimientosMenu.show {
+        max-height: 500px !important;
+    }
+    
+    .fa-chevron-down {
+        transition: transform 0.3s ease !important;
+    }
+    
+    .fa-chevron-down.fa-rotate-180 {
+        transform: rotate(180deg) !important;
+    }
 </style>
 </head>
 
@@ -668,7 +684,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const mantenimientosMenu = document.getElementById('mantenimientosMenu');
     const mantenimientosArrow = document.getElementById('mantenimientosArrow');
 
-    // CAMBIO 2: Inicialmente expandido en dashboard
     mantenimientosMenu.classList.add('show');
     mantenimientosArrow.classList.add('fa-rotate-180');
 
@@ -686,6 +701,21 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 </script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const menu = document.getElementById('mantenimientosMenu');
+    const arrow = document.getElementById('mantenimientosArrow');
 
+    if(menu) {
+        menu.classList.remove('show');
+        menu.style.maxHeight = '0';
+    }
+    if(arrow) {
+        arrow.classList.remove('fa-rotate-180');
+    }
+    
+    console.log('✅ Submenú forzado a estado CERRADO');
+});
+</script>
 </body>
 </html>
