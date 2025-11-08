@@ -148,7 +148,7 @@ include "includes/sidebar.php";
 
                                 <div class="d-flex justify-content-between align-items-center mt-4 pt-3 border-top">
                                     <a href="dashboard.php" class="btn btn-secondary-custom btn-custom">
-                                        <i class="fas fa-arrow-left me-2"></i>Volver al Dashboard
+                                        <i class="fas fa-arrow-left me-2"></i>
                                     </a>
                                     <button type="submit" class="btn btn-primary-custom btn-custom">
                                         <i class="fas fa-save me-2"></i>Guardar Producto
