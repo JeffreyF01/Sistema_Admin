@@ -97,6 +97,21 @@ if (isset($conexion) && $conexion instanceof mysqli) {
         box-shadow: 3px 0 15px rgba(0,0,0,0.2);
         z-index: 100;
         overflow-y: auto;
+        scrollbar-width: thin;
+        scrollbar-color: rgba(255,255,255,0.3) transparent;
+    }
+
+    .sidebar::-webkit-scrollbar {
+        width: 4px;
+    }
+    
+    .sidebar::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    
+    .sidebar::-webkit-scrollbar-thumb {
+        background-color: rgba(255,255,255,0.3);
+        border-radius: 2px;
     }
 
     .sidebar-header {
@@ -455,7 +470,22 @@ if (isset($conexion) && $conexion instanceof mysqli) {
     }
     
     #mantenimientosMenu.show {
-        max-height: 500px !important;
+        max-height: 300px !important;
+        overflow-y: auto !important;
+        margin-right: 4px !important;
+    }
+
+    #mantenimientosMenu::-webkit-scrollbar {
+        width: 4px;
+    }
+    
+    #mantenimientosMenu::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    
+    #mantenimientosMenu::-webkit-scrollbar-thumb {
+        background-color: rgba(255,255,255,0.3);
+        border-radius: 2px;
     }
     
     .fa-chevron-down {
