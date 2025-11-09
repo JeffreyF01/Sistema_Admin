@@ -150,6 +150,54 @@ function cargarGrupos(){
             modal.show();
         }
 
+        function eliminar(id){
+        Swal.fire({
+            title: "¿Estás seguro?",
+            text: "Esta acción eliminará el grupo permanentemente.",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#dc3545",
+            cancelButtonColor: "#6c757d",
+            confirmButtonText: "Sí, eliminar",
+            cancelButtonText: "Cancelar"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: "Grupo_ajax.php",
+                    type: "POST",
+                    data: { accion: "eliminar", id_grupos: id },
+                    success: function(res){
+                        if(res.trim() == "ok"){
+                            Swal.fire({
+                                title: "✅ Eliminado",
+                                text: "El grupo ha sido eliminado correctamente",
+                                icon: "success",
+                                confirmButtonColor: "#004aad"
+                            });
+                            cargarGrupos();
+                        } else {
+                            Swal.fire({
+                                title: "❌ Error",
+                                text: res,
+                                icon: "error",
+                                confirmButtonColor: "#dc3545"
+                            });
+                        }
+                    },
+                    error: function(){
+                        Swal.fire({
+                            title: "❌ Error de conexión",
+                            text: "No se pudo conectar con el servidor",
+                            icon: "error",
+                            confirmButtonColor: "#dc3545"
+                        });
+                    }
+                });
+            }
+     });
+}
+
+
         // Abrir modal para añadir
         $(document).on('click', '#btnAbrirModalGrupo', function(){
             $("#formGrupos")[0].reset();

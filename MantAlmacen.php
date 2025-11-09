@@ -1,4 +1,4 @@
-<?php
+<?php 
 session_start();
 if(!isset($_SESSION['usuario'])) {
     header("Location: index.html");
@@ -15,71 +15,80 @@ include "includes/sidebar.php";
         <div class="container-fluid">
             <div class="row align-items-center">
                 <div class="col">
-                    <h4 class="page-title">
-                        <i class="fas fa-warehouse me-2"></i>Mantenimiento de Almacenes
-                    </h4>
+                    <h4 class="page-title"><i class="fas fa-warehouse me-2"></i>Mantenimiento de Almacenes</h4>
                     <p class="page-subtitle">Registrar y administrar almacenes del sistema</p>
-                </div>
-                <div class="col-auto">
-                    <div class="user-info">
-                        <div class="user-avatar">
-                            <?php echo strtoupper(substr($_SESSION['usuario'], 0, 1)); ?>
-                        </div>
-                        <div class="user-details">
-                            <div class="username"><?php echo $_SESSION['usuario']; ?></div>
-                            <div class="role">Administrador</div>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
     </div>
 
     <div class="content-area">
-    <div class="container-fluid">
-        <div class="row justify-content-center">
-            <div class="col-12">  <!-- Cambié a col-12 para que ocupe todo el ancho disponible -->
-                <div class="card card-custom fade-in">
-                    <div class="card-header card-header-custom">
-                        <h4 class="mb-0">  <!-- Cambié h5 por h4 para más grande -->
-                            <i class="fas fa-plus-circle me-2"></i>Registro de Almacenes
-                        </h4>
-                    </div>
-                    <div class="card-body">
-                        <form id="formAlmacen" class="form-mantenimiento">
-                            <div class="row">
-                                <div class="col-lg-6 col-md-6 mb-4">  <!-- Ajusté columnas -->
-                                    <label class="form-label text-required fs-5">Código del Almacén</label>  <!-- fs-5 para texto más grande -->
-                                    <input type="text" name="codigo" class="form-control form-control-custom fs-6" required 
-                                           placeholder="(Ej: ALM-001)">
+        <div class="container-fluid">
+            <!-- Botón abrir modal -->
+            <div class="row mb-3">
+                <div class="col-12 d-flex justify-content-end">
+                    <button id="btnAbrirModal" class="btn btn-primary-custom">
+                        <i class="fas fa-plus-circle me-2"></i> Añadir Almacén
+                    </button>
+                </div>
+            </div>
+
+            <!-- Modal -->
+            <div class="modal fade" id="modalAlmacen" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title"><i class="fas fa-warehouse me-2"></i>Registro de Almacén</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="formAlmacen">
+                                <input type="hidden" name="id_almacen" id="id_almacen">
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Código</label>
+                                        <input type="text" name="codigo" id="codigo" class="form-control" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Nombre</label>
+                                        <input type="text" name="nombre" id="nombre" class="form-control" required>
+                                    </div>
                                 </div>
-                                <div class="col-lg-6 col-md-6 mb-4">
-                                    <label class="form-label text-required fs-5">Nombre del Almacén</label>
-                                    <input type="text" name="nombre" class="form-control form-control-custom fs-6" required 
-                                           placeholder="(Ej: Almacén Principal)">
-                                </div>
-                            </div>
-                            
-                            <div class="row">
-                                <div class="col-lg-6 col-md-6 mb-4">
-                                    <label class="form-label text-required fs-5">Estado del Almacén</label>
-                                    <select name="activo" class="form-control form-control-custom fs-6" required>
-                                        <option value="">Seleccione el estado del almacén</option>
+                                <div class="mb-3">
+                                    <label class="form-label">Estado</label>
+                                    <select name="activo" id="activo" class="form-control">
                                         <option value="1">🟢 Activo</option>
                                         <option value="0">🔴 Inactivo</option>
                                     </select>
                                 </div>
-                            </div>
-
-                            <div class="d-flex justify-content-between align-items-center mt-5 pt-4 border-top">
-                                <a href="dashboard.php" class="btn btn-secondary-custom btn-custom fs-6">
-                                    <i class="fas fa-arrow-left me-2"></i>
-                                </a>
-                                <button type="submit" class="btn btn-primary-custom btn-custom fs-6">
-                                    <i class="fas fa-save me-2"></i>Guardar Almacén
+                                <button type="submit" class="btn btn-primary-custom w-100">
+                                    <i class="fas fa-save me-2"></i>Guardar
                                 </button>
-                            </div>
-                        </form>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabla -->
+            <div class="card card-custom fade-in">
+                <div class="card-header card-header-custom">
+                    <h5><i class="fas fa-list me-2"></i>Lista de Almacenes</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-mantenimiento align-middle text-center">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Código</th>
+                                    <th>Nombre</th>
+                                    <th>Estado</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tablaAlmacen"></tbody>
+                        </table>
                     </div>
                 </div>
             </div>
@@ -88,31 +97,68 @@ include "includes/sidebar.php";
 </div>
 
 <script>
-$("#formAlmacen").on("submit", function(e){
-    e.preventDefault();
-    $.ajax({
-        url: "Almacen_ajax.php",
-        type: "POST",
-        data: $(this).serialize(),
-        success: function(res){
-            if(res.trim() === "ok"){
-                Swal.fire({
-                    title: "✅ Éxito",
-                    text: "Almacén registrado correctamente",
-                    icon: "success",
-                    confirmButtonColor: "#004aad"
-                });
-                $("#formAlmacen")[0].reset();
-            } else {
-                Swal.fire({
-                    title: "❌ Error",
-                    text: res,
-                    icon: "error", 
-                    confirmButtonColor: "#dc3545"
-                });
-            }
+function cargarAlmacenes(){
+    $.get("Almacen_listar.php", function(data){
+        $("#tablaAlmacen").html(data);
+    });
+}
+
+function editar(id, codigo, nombre, activo){
+    $("#id_almacen").val(id);
+    $("#codigo").val(codigo);
+    $("#nombre").val(nombre);
+    $("#activo").val(activo);
+    let modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('modalAlmacen'));
+    modal.show();
+}
+
+function eliminar(id){
+    Swal.fire({
+        title: "¿Eliminar almacén?",
+        text: "Esta acción no se puede deshacer.",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#dc3545",
+        cancelButtonColor: "#6c757d",
+        confirmButtonText: "Sí, eliminar"
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.post("Almacen_ajax.php", { eliminar: true, id_almacen: id }, function(res){
+                if(res.trim() === "ok"){
+                    Swal.fire("Eliminado", "El almacén fue eliminado correctamente", "success");
+                    cargarAlmacenes();
+                } else {
+                    Swal.fire("Error", res, "error");
+                }
+            });
         }
     });
+}
+
+$("#btnAbrirModal").click(function(){
+    $("#formAlmacen")[0].reset();
+    $("#id_almacen").val('');
+    let modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('modalAlmacen'));
+    modal.show();
+});
+
+$("#formAlmacen").on("submit", function(e){
+    e.preventDefault();
+    $.post("Almacen_ajax.php", $(this).serialize(), function(res){
+        if(res.trim() === "ok"){
+            Swal.fire("✅ Éxito", "Almacén guardado correctamente", "success");
+            let modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('modalAlmacen'));
+            modal.hide();
+            $("#formAlmacen")[0].reset();
+            cargarAlmacenes();
+        } else {
+            Swal.fire("❌ Error", res, "error");
+        }
+    });
+});
+
+$(document).ready(function(){
+    cargarAlmacenes();
 });
 </script>
 

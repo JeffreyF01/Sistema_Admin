@@ -135,6 +135,45 @@ function editar(id, nombre, activo){
     modal.show();
 }
 
+function eliminarDepartamento(id) {
+    Swal.fire({
+        title: "¿Eliminar departamento?",
+        text: "Esta acción no se puede deshacer",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#dc3545",
+        cancelButtonColor: "#6c757d",
+        confirmButtonText: "Sí, eliminar",
+        cancelButtonText: "Cancelar"
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.ajax({
+                url: "Departamento_ajax.php",
+                type: "POST",
+                data: { accion: "eliminar", id: id },
+                success: function(res) {
+                    if (res.trim() === "ok") {
+                        Swal.fire({
+                            title: "✅ Eliminado",
+                            text: "El departamento ha sido eliminado correctamente",
+                            icon: "success",
+                            confirmButtonColor: "#004aad"
+                        });
+                        cargarDepartamentos();
+                    } else {
+                        Swal.fire({
+                            title: "❌ Error",
+                            text: "No se pudo eliminar. Es posible que esté asociado a otros registros.",
+                            icon: "error",
+                            confirmButtonColor: "#dc3545"
+                        });
+                    }
+                }
+            });
+        }
+    });
+}
+
 // Abrir modal para añadir nuevo departamento y limpiar el formulario
 $(document).on('click', '#btnAbrirModal', function(){
     $("#formDepartamentos")[0].reset();

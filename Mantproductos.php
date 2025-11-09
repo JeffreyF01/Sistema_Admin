@@ -1,4 +1,4 @@
-<?php
+<?php 
 session_start();
 if(!isset($_SESSION['usuario'])) {
     header("Location: index.html");
@@ -11,26 +11,12 @@ include "includes/sidebar.php";
 ?>
 
 <div class="main-content">
-    <!-- Header de página -->
     <div class="main-header">
         <div class="container-fluid">
             <div class="row align-items-center">
                 <div class="col">
-                    <h4 class="page-title">
-                        <i class="fas fa-box me-2"></i>Mantenimiento de Productos
-                    </h4>
-                    <p class="page-subtitle">Gestionar productos del inventario del sistema</p>
-                </div>
-                <div class="col-auto">
-                    <div class="user-info">
-                        <div class="user-avatar">
-                            <?php echo strtoupper(substr($_SESSION['usuario'], 0, 1)); ?>
-                        </div>
-                        <div class="user-details">
-                            <div class="username"><?php echo $_SESSION['usuario']; ?></div>
-                            <div class="role">Administrador</div>
-                        </div>
-                    </div>
+                    <h4 class="page-title"><i class="fas fa-box me-2"></i>Mantenimiento de Productos</h4>
+                    <p class="page-subtitle">Registrar y administrar productos del sistema</p>
                 </div>
             </div>
         </div>
@@ -38,124 +24,142 @@ include "includes/sidebar.php";
 
     <div class="content-area">
         <div class="container-fluid">
-            <div class="row justify-content-center">
-                <div class="col-12">
-                    <div class="card card-custom fade-in">
-                        <div class="card-header card-header-custom">
-                            <h5 class="mb-0">
-                                <i class="fas fa-plus-circle me-2"></i>Registro de Productos
-                            </h5>
+
+            <!-- Botón abrir modal -->
+            <div class="row mb-3">
+                <div class="col-12 d-flex justify-content-end">
+                    <button id="btnAbrirModal" class="btn btn-primary-custom">
+                        <i class="fas fa-plus-circle me-2"></i> Añadir Producto
+                    </button>
+                </div>
+            </div>
+
+            <!-- Modal -->
+            <div class="modal fade" id="modalProducto" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title"><i class="fas fa-box me-2"></i>Registro de Producto</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                         </div>
-                        <div class="card-body">
-                            <form id="formProductos" class="form-mantenimiento">
-                                
-                                <div class="row">
-                                    <div class="col-md-4 mb-4">
-                                        <label class="form-label text-required">SKU del Producto</label>
-                                        <input type="text" name="sku" class="form-control form-control-custom" required 
-                                               placeholder="Ej: PROD-001, SKU-2024">
-                                    </div>
+                        <div class="modal-body">
+                            <form id="formProducto">
+                                <input type="hidden" name="id_productos" id="id_productos">
 
-                                    <div class="col-md-8 mb-4">
-                                        <label class="form-label text-required">Nombre del Producto</label>
-                                        <input type="text" name="nombre" class="form-control form-control-custom" required 
-                                               placeholder="Ej: Laptop Dell Inspiron 15, Smartphone Samsung Galaxy">
+                                <div class="row mb-3">
+                                    <div class="col-md-4">
+                                        <label class="form-label">SKU</label>
+                                        <input type="text" name="sku" id="sku" class="form-control" required>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <label class="form-label">Nombre</label>
+                                        <input type="text" name="nombre" id="nombre" class="form-control" required>
                                     </div>
                                 </div>
 
-                                <div class="row">
-                                    <div class="col-md-4 mb-4">
-                                        <label class="form-label text-required">Departamento</label>
-                                        <select name="departamento_id" class="form-control form-control-custom" required>
-                                            <option value="">Seleccione un departamento...</option>
+                                <div class="row mb-3">
+                                    <div class="col-md-4">
+                                        <label class="form-label">Departamento</label>
+                                        <select name="departamento_id" id="departamento_id" class="form-select" required>
+                                            <option value="">Seleccione...</option>
                                             <?php
-                                            $sql = $conexion->query("SELECT id_departamentos, nombre FROM departamento WHERE activo = 1 ORDER BY nombre");
-                                            while($d = $sql->fetch_assoc()){
-                                                echo "<option value='".$d['id_departamentos']."'>".$d['nombre']."</option>";
+                                            $res = $conexion->query("SELECT id_departamentos, nombre FROM departamento WHERE activo=1");
+                                            while($dep = $res->fetch_assoc()){ 
+                                                echo "<option value='{$dep['id_departamentos']}'>{$dep['nombre']}</option>";
                                             }
                                             ?>
                                         </select>
                                     </div>
-
-                                    <div class="col-md-4 mb-4">
-                                        <label class="form-label text-required">Grupo</label>
-                                        <select name="grupo_id" class="form-control form-control-custom" required>
-                                            <option value="">Seleccione un grupo...</option>
+                                    <div class="col-md-4">
+                                        <label class="form-label">Grupo</label>
+                                        <select name="grupo_id" id="grupo_id" class="form-select" required>
+                                            <option value="">Seleccione...</option>
                                             <?php
-                                            $sql = $conexion->query("SELECT id_grupos, nombre FROM grupo WHERE activo = 1 ORDER BY nombre");
-                                            while($g = $sql->fetch_assoc()){
-                                                echo "<option value='".$g['id_grupos']."'>".$g['nombre']."</option>";
+                                            $res = $conexion->query("SELECT id_grupos, nombre FROM grupo WHERE activo=1");
+                                            while($g = $res->fetch_assoc()){ 
+                                                echo "<option value='{$g['id_grupos']}'>{$g['nombre']}</option>";
                                             }
                                             ?>
                                         </select>
                                     </div>
-
-                                    <div class="col-md-4 mb-4">
-                                        <label class="form-label text-required">Unidad de Medida</label>
-                                        <input type="text" name="unidad" class="form-control form-control-custom" required 
-                                               placeholder="Ej: Unidad, Pieza, Kg, Litro">
-                                    </div>
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-md-3 mb-4">
-                                        <label class="form-label text-required">Precio de Venta</label>
-                                        <input type="number" step="0.01" name="precio_venta" class="form-control form-control-custom" required 
-                                               placeholder="0.00" min="0">
-                                    </div>
-
-                                    <div class="col-md-3 mb-4">
-                                        <label class="form-label text-required">Costo</label>
-                                        <input type="number" step="0.01" name="costo" class="form-control form-control-custom" required 
-                                               placeholder="0.00" min="0">
-                                    </div>
-
-                                    <div class="col-md-3 mb-4">
-                                        <label class="form-label text-required">Stock Actual</label>
-                                        <input type="number" name="stock" class="form-control form-control-custom" required 
-                                               placeholder="0" min="0">
-                                    </div>
-
-                                    <div class="col-md-3 mb-4">
-                                        <label class="form-label text-required">Stock Mínimo</label>
-                                        <input type="number" name="stock_min" class="form-control form-control-custom" required 
-                                               placeholder="0" min="0">
-                                    </div>
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-md-6 mb-4">
-                                        <label class="form-label text-required">Ubicación</label>
-                                        <select name="ubicacion_id" class="form-control form-control-custom" required>
-                                            <option value="">Seleccione una ubicación...</option>
+                                    <div class="col-md-4">
+                                        <label class="form-label">Ubicación</label>
+                                        <select name="ubicacion_id" id="ubicacion_id" class="form-select" required>
+                                            <option value="">Seleccione...</option>
                                             <?php
-                                            $sql = $conexion->query("SELECT id_ubicaciones, nombre FROM ubicacion WHERE activo = 1 ORDER BY nombre");
-                                            while($u = $sql->fetch_assoc()){
-                                                echo "<option value='".$u['id_ubicaciones']."'>".$u['nombre']."</option>";
+                                            $res = $conexion->query("SELECT id_ubicaciones, nombre FROM ubicacion WHERE activo=1");
+                                            while($u = $res->fetch_assoc()){ 
+                                                echo "<option value='{$u['id_ubicaciones']}'>{$u['nombre']}</option>";
                                             }
                                             ?>
                                         </select>
                                     </div>
+                                </div>
 
-                                    <div class="col-md-6 mb-4">
-                                        <label class="form-label text-required">Estado</label>
-                                        <select name="activo" class="form-control form-control-custom" required>
+                                <div class="row mb-3">
+                                    <div class="col-md-3">
+                                        <label class="form-label">Unidad</label>
+                                        <input type="text" name="unidad" id="unidad" class="form-control" required>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label">Stock</label>
+                                        <input type="number" name="stock" id="stock" class="form-control" required>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label">Stock Mín.</label>
+                                        <input type="number" name="stock_min" id="stock_min" class="form-control" required>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label">Estado</label>
+                                        <select name="activo" id="activo" class="form-select">
                                             <option value="1">🟢 Activo</option>
                                             <option value="0">🔴 Inactivo</option>
                                         </select>
                                     </div>
                                 </div>
 
-                                <div class="d-flex justify-content-between align-items-center mt-4 pt-3 border-top">
-                                    <a href="dashboard.php" class="btn btn-secondary-custom btn-custom">
-                                        <i class="fas fa-arrow-left me-2"></i>
-                                    </a>
-                                    <button type="submit" class="btn btn-primary-custom btn-custom">
-                                        <i class="fas fa-save me-2"></i>Guardar Producto
-                                    </button>
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Precio Venta</label>
+                                        <input type="number" step="0.01" name="precio_venta" id="precio_venta" class="form-control" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Costo</label>
+                                        <input type="number" step="0.01" name="costo" id="costo" class="form-control" required>
+                                    </div>
                                 </div>
+
+                                <button type="submit" class="btn btn-primary-custom w-100">
+                                    <i class="fas fa-save me-2"></i>Guardar Producto
+                                </button>
                             </form>
                         </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabla -->
+            <div class="card card-custom fade-in">
+                <div class="card-header card-header-custom">
+                    <h5><i class="fas fa-list me-2"></i>Lista de Productos</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-mantenimiento table-sm align-middle text-center">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>SKU</th>
+                                    <th>Nombre</th>
+                                    <th>Departamento</th>
+                                    <th>Grupo</th>
+                                    <th>Stock</th>
+                                    <th>Estado</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tablaProducto"></tbody>
+                        </table>
                     </div>
                 </div>
             </div>
@@ -164,53 +168,82 @@ include "includes/sidebar.php";
 </div>
 
 <script>
-$("#formProductos").on("submit", function(e){
-    e.preventDefault();
+// ================= FUNCIONES ================= //
+function cargarProductos(){
+    $.get("Producto_listar.php", function(data){
+        $("#tablaProducto").html(data);
+    });
+}
 
-    // Mostrar loading
-    const submitBtn = $(this).find('button[type="submit"]');
-    const originalText = submitBtn.html();
-    submitBtn.html('<i class="fas fa-spinner fa-spin me-2"></i>Guardando...');
-    submitBtn.prop('disabled', true);
-
-    $.ajax({
-        url: "Ajax/producto_ajax.php",
-        type: "POST",
-        data: $(this).serialize(),
-        success: function(res){
-            // Restaurar botón
-            submitBtn.html(originalText);
-            submitBtn.prop('disabled', false);
-
-            if(res == "ok"){
-                Swal.fire({
-                    title: "✅ Éxito",
-                    text: "Producto registrado correctamente",
-                    icon: "success",
-                    confirmButtonColor: "#004aad"
-                });
-                $("#formProductos")[0].reset();
-            } else {
-                Swal.fire({
-                    title: "❌ Error",
-                    text: res,
-                    icon: "error",
-                    confirmButtonColor: "#dc3545"
-                });
-            }
-        },
-        error: function(){
-            // Restaurar botón en caso de error
-            submitBtn.html(originalText);
-            submitBtn.prop('disabled', false);
-            Swal.fire({
-                title: "❌ Error de conexión",
-                text: "No se pudo conectar con el servidor",
-                icon: "error",
-                confirmButtonColor: "#dc3545"
+function eliminar(id){
+    Swal.fire({
+        title: "¿Eliminar producto?",
+        text: "Esta acción no se puede deshacer.",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#dc3545",
+        cancelButtonColor: "#6c757d",
+        confirmButtonText: "Sí, eliminar"
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.post("Producto_ajax.php", { accion: "eliminar", id_productos: id }, function(res){
+                if(res.trim() === "ok"){
+                    Swal.fire("Eliminado", "El producto fue eliminado correctamente", "success");
+                    cargarProductos();
+                } else {
+                    Swal.fire("Error", res, "error");
+                }
             });
         }
     });
+}
+
+$(document).on("click", ".btn-editar", function(){
+    $("#id_productos").val($(this).data("id"));
+    $("#sku").val($(this).data("sku"));
+    $("#nombre").val($(this).data("nombre"));
+    $("#departamento_id").val($(this).data("departamento"));
+    $("#grupo_id").val($(this).data("grupo"));
+    $("#ubicacion_id").val($(this).data("ubicacion"));
+    $("#unidad").val($(this).data("unidad"));
+    $("#precio_venta").val($(this).data("precio"));
+    $("#costo").val($(this).data("costo"));
+    $("#stock").val($(this).data("stock"));
+    $("#stock_min").val($(this).data("stockmin"));
+    $("#activo").val($(this).data("activo"));
+
+    let modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('modalProducto'));
+    modal.show();
+});
+
+$("#btnAbrirModal").click(function(){
+    $("#formProducto")[0].reset();
+    $("#id_productos").val('');
+    let modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('modalProducto'));
+    modal.show();
+});
+
+$("#formProducto").on("submit", function(e){
+    e.preventDefault();
+
+    let accion = $("#id_productos").val() ? "editar" : "agregar";
+    let formData = $(this).serialize() + "&accion=" + accion;
+
+    $.post("Producto_ajax.php", formData, function(res){
+        if(res.trim() === "ok"){
+            Swal.fire("✅ Éxito", "Producto guardado correctamente", "success");
+            let modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('modalProducto'));
+            modal.hide();
+            $("#formProducto")[0].reset();
+            cargarProductos();
+        } else {
+            Swal.fire("❌ Error", res, "error");
+        }
+    });
+});
+
+$(document).ready(function(){
+    cargarProductos();
 });
 </script>
 

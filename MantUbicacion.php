@@ -36,9 +36,10 @@ include "includes/sidebar.php";
         </div>
     </div>
 
+    <!-- Contenido principal -->
     <div class="content-area">
         <div class="container-fluid">
-            <!-- Botón para abrir modal (añadir) -->
+            <!-- Botón para abrir modal -->
             <div class="row mb-3">
                 <div class="col-12 d-flex justify-content-end">
                     <button id="btnAbrirModalUbicacion" type="button" class="btn btn-primary-custom">
@@ -47,12 +48,12 @@ include "includes/sidebar.php";
                 </div>
             </div>
 
-            <!-- Modal: Formulario de Ubicaciones -->
+            <!-- Modal de Ubicación -->
             <div class="modal fade" id="modalUbicacion" tabindex="-1" aria-labelledby="modalUbicacionLabel" aria-hidden="true">
                 <div class="modal-dialog modal-lg modal-dialog-centered">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h5 class="modal-title" id="modalUbicacionLabel"><i class="fas fa-plus-circle me-2"></i>Registro de Ubicaciones</h5>
+                            <h5 class="modal-title" id="modalUbicacionLabel"><i class="fas fa-plus-circle me-2"></i>Registro de Ubicación</h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                         </div>
                         <div class="modal-body">
@@ -62,14 +63,12 @@ include "includes/sidebar.php";
                                 <div class="row">
                                     <div class="col-md-4 mb-4">
                                         <label class="form-label text-required">Código de Ubicación</label>
-                                        <input type="text" name="codigo" id="codigo" class="form-control form-control-custom" required 
-                                               placeholder="Ej: UBI-001">
+                                        <input type="text" name="codigo" id="codigo" class="form-control form-control-custom" required placeholder="Ej: UBI-001">
                                     </div>
 
                                     <div class="col-md-8 mb-4">
                                         <label class="form-label text-required">Nombre de la Ubicación</label>
-                                        <input type="text" name="nombre" id="nombre" class="form-control form-control-custom" required 
-                                               placeholder="Ej: Estantería A - Nivel 1">
+                                        <input type="text" name="nombre" id="nombre" class="form-control form-control-custom" required placeholder="Ej: Estantería A - Nivel 1">
                                     </div>
                                 </div>
 
@@ -123,10 +122,10 @@ include "includes/sidebar.php";
                                         <tr>
                                             <th width="8%">ID</th>
                                             <th width="20%">Código</th>
-                                            <th width="35%">Nombre</th>
+                                            <th width="30%">Nombre</th>
                                             <th width="20%">Almacén</th>
-                                            <th width="10%">Estado</th>
-                                            <th width="7%">Acciones</th>
+                                            <th width="12%">Estado</th>
+                                            <th width="10%">Acciones</th>
                                         </tr>
                                     </thead>
                                     <tbody id="tablaUbicaciones"></tbody>
@@ -151,54 +150,48 @@ function cargarUbicaciones(){
     });
 }
 
-function editar(id, codigo, nombre, id_alm, activo){
-    // Rellenar campos
-    $("#id_ubicaciones").val(id);
-    $("#codigo").val(codigo);
-    $("#nombre").val(nombre);
-    $("#id_almacen").val(id_alm);
-    $("#activo").val(activo);
-
-    // Abrir modal
-    var modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('modalUbicacion'));
-    modal.show();
-}
-
-// Abrir modal para añadir nuevo
+// Abrir modal NUEVO
 $(document).on('click', '#btnAbrirModalUbicacion', function(){
     $("#formUbicacion")[0].reset();
     $("#id_ubicaciones").val('');
+    $("#modalUbicacionLabel").html('<i class="fas fa-plus-circle me-2"></i>Registro de Ubicación');
     var modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('modalUbicacion'));
     modal.show();
 });
 
+// Abrir modal EDITAR (usa data-atributos del botón)
+$(document).on("click", ".btn-editar", function(){
+    $("#id_ubicaciones").val($(this).data("id"));
+    $("#codigo").val($(this).data("codigo"));
+    $("#nombre").val($(this).data("nombre"));
+    $("#id_almacen").val($(this).data("almacen"));
+    $("#activo").val($(this).data("activo"));
+    $("#modalUbicacionLabel").html('<i class="fas fa-edit me-2"></i>Editar Ubicación');
+    let modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('modalUbicacion'));
+    modal.show();
+});
+
+// Guardar / actualizar
 $("#formUbicacion").on("submit", function(e){
     e.preventDefault();
-
-    // Mostrar loading
     const submitBtn = $(this).find('button[type="submit"]');
     const originalText = submitBtn.html();
-    submitBtn.html('<i class="fas fa-spinner fa-spin me-2"></i>Guardando...');
-    submitBtn.prop('disabled', true);
+    submitBtn.html('<i class="fas fa-spinner fa-spin me-2"></i>Guardando...').prop('disabled', true);
 
     $.ajax({
-        url: "ubicacion_ajax.php",
+        url: "Ubicacion_ajax.php",
         type: "POST",
         data: $(this).serialize(),
         success: function(res){
-            // Restaurar botón
-            submitBtn.html(originalText);
-            submitBtn.prop('disabled', false);
-
-            if(res.trim() == "ok"){
+            submitBtn.html(originalText).prop('disabled', false);
+            if(res.trim() === "ok"){
                 Swal.fire({
                     title: "✅ Éxito",
-                    text: "Ubicación registrada correctamente",
+                    text: "Ubicación guardada correctamente",
                     icon: "success",
                     confirmButtonColor: "#004aad"
                 });
-                // Cerrar modal, limpiar y recargar tabla
-                var modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('modalUbicacion'));
+                let modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('modalUbicacion'));
                 modal.hide();
                 $("#formUbicacion")[0].reset();
                 $("#id_ubicaciones").val('');
@@ -213,9 +206,7 @@ $("#formUbicacion").on("submit", function(e){
             }
         },
         error: function(){
-            // Restaurar botón en caso de error
-            submitBtn.html(originalText);
-            submitBtn.prop('disabled', false);
+            submitBtn.html(originalText).prop('disabled', false);
             Swal.fire({
                 title: "❌ Error de conexión",
                 text: "No se pudo conectar con el servidor",
@@ -225,6 +216,40 @@ $("#formUbicacion").on("submit", function(e){
         }
     });
 });
+
+// Eliminar con confirmación
+function eliminar(id){
+    Swal.fire({
+        title: "¿Eliminar ubicación?",
+        text: "Esta acción no se puede deshacer",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#dc3545",
+        cancelButtonColor: "#6c757d",
+        confirmButtonText: "Sí, eliminar"
+    }).then((result) => {
+        if(result.isConfirmed){
+            $.post("Ubicacion_ajax.php", { eliminar: id }, function(res){
+                if(res.trim() === "ok"){
+                    Swal.fire({
+                        title: "✅ Eliminado",
+                        text: "Ubicación eliminada correctamente",
+                        icon: "success",
+                        confirmButtonColor: "#004aad"
+                    });
+                    cargarUbicaciones();
+                } else {
+                    Swal.fire({
+                        title: "❌ Error",
+                        text: res,
+                        icon: "error",
+                        confirmButtonColor: "#dc3545"
+                    });
+                }
+            });
+        }
+    });
+}
 
 // Cargar ubicaciones al iniciar
 $(document).ready(function(){
