@@ -523,7 +523,7 @@ if (isset($conexion) && $conexion instanceof mysqli) {
                 <i class="fa-solid fa-chevron-down ms-auto" id="mantenimientosArrow"></i>
             </a>
     
-            <div class="submenu show" id="mantenimientosMenu">
+            <div class="submenu" id="mantenimientosMenu">
                 <a href="Mantproductos.php" class="submenu-link">
                     <i class="fa-solid fa-box"></i>
                     <span>Productos</span>
@@ -559,10 +559,34 @@ if (isset($conexion) && $conexion instanceof mysqli) {
         </div>
 
         <div class="sidebar-item">
-            <a href="#" class="sidebar-link">
-                <i class="fa-solid fa-search"></i>
+            <a href="#" class="sidebar-link" id="consultasBtn">
+                <i class="fa-solid fa-magnifying-glass-chart"></i>
                 <span>Consultas</span>
+                <i class="fa-solid fa-chevron-down ms-auto" id="consultasArrow"></i>
             </a>
+
+            <div class="submenu" id="consultasMenu">
+                <a href="#" class="submenu-link">
+                    <i class="fa-solid fa-file-signature"></i>
+                    <span>Cotizaciones</span>
+                </a>
+                <a href="#" class="submenu-link">
+                    <i class="fa-solid fa-cart-shopping"></i>
+                    <span>Compras</span>
+                </a>
+                <a href="#" class="submenu-link">
+                    <i class="fa-solid fa-right-left"></i>
+                    <span>Entradas / Salidas</span>
+                </a>
+                <a href="#" class="submenu-link">
+                    <i class="fa-solid fa-rotate-left"></i>
+                    <span>Devoluciones</span>
+                </a>
+                <a href="#" class="submenu-link">
+                    <i class="fa-solid fa-file-invoice-dollar"></i>
+                    <span>Facturas</span>
+                </a>
+            </div>
         </div>
 
         <div class="sidebar-item">
@@ -580,6 +604,7 @@ if (isset($conexion) && $conexion instanceof mysqli) {
         </div>
     </div>
 </div>
+
 
 <div class="main-content">
     <div class="top-header">
@@ -714,13 +739,20 @@ document.addEventListener('DOMContentLoaded', function() {
     const mantenimientosMenu = document.getElementById('mantenimientosMenu');
     const mantenimientosArrow = document.getElementById('mantenimientosArrow');
 
-    mantenimientosMenu.classList.add('show');
-    mantenimientosArrow.classList.add('fa-rotate-180');
-
     mantenimientosBtn.addEventListener('click', function(e) {
         e.preventDefault();
         mantenimientosMenu.classList.toggle('show');
         mantenimientosArrow.classList.toggle('fa-rotate-180');
+    });
+
+    const consultasBtn = document.getElementById('consultasBtn');
+    const consultasMenu = document.getElementById('consultasMenu');
+    const consultasArrow = document.getElementById('consultasArrow');
+
+    consultasBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        consultasMenu.classList.toggle('show');
+        consultasArrow.classList.toggle('fa-rotate-180');
     });
 
     document.addEventListener('click', function(e) {
@@ -728,8 +760,13 @@ document.addEventListener('DOMContentLoaded', function() {
             mantenimientosMenu.classList.remove('show');
             mantenimientosArrow.classList.remove('fa-rotate-180');
         }
+        if (!consultasBtn.contains(e.target) && !consultasMenu.contains(e.target)) {
+            consultasMenu.classList.remove('show');
+            consultasArrow.classList.remove('fa-rotate-180');
+        }
     });
 });
+
 </script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
