@@ -141,6 +141,14 @@ body {
     text-decoration: none;
 }
 
+/* Chevron rotation utility */
+.chevron {
+    transition: transform 0.3s ease;
+}
+.chevron.fa-rotate-180 {
+    transform: rotate(180deg);
+}
+
 /* Main content */
 .main-content {
     margin-left: var(--sidebar-width);
