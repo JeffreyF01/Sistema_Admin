@@ -7,7 +7,11 @@
     ];
     $consultaPages = [
         'Consulta_departamento.php',
-        'Consulta_ubicacion.php'
+        'Consulta_ubicacion.php',
+        'Consulta_almacen.php',
+        'Consulta_grupo.php',
+        'Consulta_tiposmov.php',
+        'Consulta_producto.php'
     ];
     $isDashboard = ($current === 'dashboard.php');
     $isMantenimiento = in_array($current, $mantenimientoPages, true);
@@ -85,6 +89,22 @@
                 <a href="<?php echo $baseUrl; ?>Consultas/Consulta_ubicacion.php" class="submenu-link <?php echo $current === 'Consulta_ubicacion.php' ? 'active' : ''; ?>">
                     <i class="fa-solid fa-location-dot"></i>
                     <span>Ubicaciones</span>
+                </a>
+                <a href="<?php echo $baseUrl; ?>Consultas/Consulta_almacen.php" class="submenu-link <?php echo $current === 'Consulta_almacen.php' ? 'active' : ''; ?>">
+                    <i class="fa-solid fa-warehouse"></i>
+                    <span>Almacenes</span>
+                </a>
+                <a href="<?php echo $baseUrl; ?>Consultas/Consulta_grupo.php" class="submenu-link <?php echo $current === 'Consulta_grupo.php' ? 'active' : ''; ?>">
+                    <i class="fa-solid fa-people-group"></i>
+                    <span>Grupos</span>
+                </a>
+                <a href="<?php echo $baseUrl; ?>Consultas/Consulta_tiposmov.php" class="submenu-link <?php echo $current === 'Consulta_tiposmov.php' ? 'active' : ''; ?>">
+                    <i class="fa-solid fa-arrows-rotate"></i>
+                    <span>Tipos de Movimiento</span>
+                </a>
+                <a href="<?php echo $baseUrl; ?>Consultas/Consulta_producto.php" class="submenu-link <?php echo $current === 'Consulta_producto.php' ? 'active' : ''; ?>">
+                    <i class="fa-solid fa-box"></i>
+                    <span>Productos</span>
                 </a>
                 <!-- Futuras consultas
                 <a href="#" class="submenu-link">
