@@ -1,12 +1,14 @@
 <?php
 session_start();
 if(!isset($_SESSION['usuario'])) {
-    header("Location: index.html");
+    // Volver al inicio de sesión en la raíz del proyecto
+    header("Location: ../index.html");
     exit();
 }
-require_once 'conexion.php';
-include 'includes/header.php';
-include 'includes/sidebar.php';
+// Ajustar rutas relativas desde la carpeta Consultas/
+require_once '../conexion.php';
+include '../includes/header.php';
+include '../includes/sidebar.php';
 ?>
 <div class="main-content">
     <div class="main-header">
@@ -92,11 +94,13 @@ include 'includes/sidebar.php';
                                     $result = $conexion->query($query);
                                     if ($result && $result->num_rows > 0) {
                                         while ($row = $result->fetch_assoc()) {
-                                            $estadoBadge = $row['activo'] ? 
-                                                "<span class='badge bg-success badge-estado'><i class='fa-solid fa-circle-check me-1'></i>Activo</span>" : 
-                                                "<span class='badge bg-danger badge-estado'><i class='fa-solid fa-circle-xmark me-1'></i>Inactivo</span>";
+                                            // Estilo de estado igual que en Mantenimientos
+                                            $estadoBadge = $row['activo']
+                                                ? "<span style='background-color:#d1e7dd;color:#0f5132;padding:6px 12px;border-radius:20px;font-weight:500;'>\n                 <i class=\"fas fa-circle me-1\" style=\"font-size:8px;color:#198754;\"></i>Activo\n               </span>"
+                                                : "<span style='background-color:#f8d7da;color:#842029;padding:6px 12px;border-radius:20px;font-weight:500;'>\n                 <i class=\"fas fa-circle me-1\" style=\"font-size:8px;color:#dc3545;\"></i>Inactivo\n               </span>";
                                             echo "<tr data-activo='{$row['activo']}'>";
-                                            echo "<td><strong>#" . htmlspecialchars($row['id_departamentos']) . "</strong></td>";
+                                            // Números de la tabla igual que Mantenimientos (sin # y sin negrita)
+                                            echo "<td>" . htmlspecialchars($row['id_departamentos']) . "</td>";
                                             echo "<td>" . htmlspecialchars($row['nombre']) . "</td>";
                                             echo "<td>{$estadoBadge}</td>";
                                             echo "</tr>";
@@ -160,4 +164,4 @@ document.addEventListener('DOMContentLoaded', function() {
     searchInput.focus();
 });
 </script>
-<?php include 'includes/footer.php'; ?>
+<?php include '../includes/footer.php'; ?>

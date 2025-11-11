@@ -1,6 +1,6 @@
 <?php
-    // Resolver página actual y grupos para activar/expandir
     $current = basename($_SERVER['PHP_SELF']);
+    $baseUrl = '/Sistema_Admin/';
     $mantenimientoPages = [
         'Mantproductos.php','MantAlmacen.php','MantUbicacion.php',
         'MantDepartamento.php','MantGrupo.php','MantTiposMov.php'
@@ -23,7 +23,7 @@
 
     <div class="sidebar-menu">
         <div class="sidebar-item">
-            <a href="dashboard.php" class="sidebar-link <?php echo $isDashboard ? 'active' : ''; ?>">
+            <a href="<?php echo $baseUrl; ?>dashboard.php" class="sidebar-link <?php echo $isDashboard ? 'active' : ''; ?>">
                 <i class="fa-solid fa-gauge-high"></i>
                 <span>Dashboard</span>
             </a>
@@ -36,27 +36,27 @@
                 <i class="fa-solid fa-chevron-down ms-auto chevron <?php echo $isMantenimiento ? 'fa-rotate-180' : ''; ?>"></i>
             </a>
             <div class="submenu <?php echo $isMantenimiento ? 'show' : ''; ?>" id="mantenimientosMenu">
-                <a href="Mantproductos.php" class="submenu-link <?php echo $current === 'Mantproductos.php' ? 'active' : ''; ?>">
+                <a href="<?php echo $baseUrl; ?>Mantproductos.php" class="submenu-link <?php echo $current === 'Mantproductos.php' ? 'active' : ''; ?>">
                     <i class="fa-solid fa-box"></i>
                     <span>Productos</span>
                 </a>
-                <a href="MantAlmacen.php" class="submenu-link <?php echo $current === 'MantAlmacen.php' ? 'active' : ''; ?>">
+                <a href="<?php echo $baseUrl; ?>MantAlmacen.php" class="submenu-link <?php echo $current === 'MantAlmacen.php' ? 'active' : ''; ?>">
                     <i class="fa-solid fa-warehouse"></i>
                     <span>Almacenes</span>
                 </a>
-                <a href="MantUbicacion.php" class="submenu-link <?php echo $current === 'MantUbicacion.php' ? 'active' : ''; ?>">
+                <a href="<?php echo $baseUrl; ?>MantUbicacion.php" class="submenu-link <?php echo $current === 'MantUbicacion.php' ? 'active' : ''; ?>">
                     <i class="fa-solid fa-location-dot"></i>
                     <span>Ubicaciones</span>
                 </a>
-                <a href="MantDepartamento.php" class="submenu-link <?php echo $current === 'MantDepartamento.php' ? 'active' : ''; ?>">
+                <a href="<?php echo $baseUrl; ?>MantDepartamento.php" class="submenu-link <?php echo $current === 'MantDepartamento.php' ? 'active' : ''; ?>">
                     <i class="fa-solid fa-building"></i>
                     <span>Departamentos</span>
                 </a>
-                <a href="MantGrupo.php" class="submenu-link <?php echo $current === 'MantGrupo.php' ? 'active' : ''; ?>">
+                <a href="<?php echo $baseUrl; ?>MantGrupo.php" class="submenu-link <?php echo $current === 'MantGrupo.php' ? 'active' : ''; ?>">
                     <i class="fa-solid fa-people-group"></i>
                     <span>Grupos</span>
                 </a>
-                <a href="MantTiposMov.php" class="submenu-link <?php echo $current === 'MantTiposMov.php' ? 'active' : ''; ?>">
+                <a href="<?php echo $baseUrl; ?>MantTiposMov.php" class="submenu-link <?php echo $current === 'MantTiposMov.php' ? 'active' : ''; ?>">
                     <i class="fa-solid fa-arrows-rotate"></i>
                     <span>Tipos de movimiento</span>
                 </a>
@@ -77,7 +77,7 @@
                 <i class="fa-solid fa-chevron-down ms-auto chevron <?php echo $isConsulta ? 'fa-rotate-180' : ''; ?>"></i>
             </a>
             <div class="submenu <?php echo $isConsulta ? 'show' : ''; ?>" id="consultasMenu">
-                <a href="Consulta_departamento.php" class="submenu-link <?php echo $current === 'Consulta_departamento.php' ? 'active' : ''; ?>">
+                <a href="<?php echo $baseUrl; ?>Consultas/Consulta_departamento.php" class="submenu-link <?php echo $current === 'Consulta_departamento.php' ? 'active' : ''; ?>">
                     <i class="fa-solid fa-building"></i>
                     <span>Departamentos</span>
                 </a>
@@ -102,7 +102,7 @@
         </div>
 
         <div class="sidebar-item mt-4">
-            <a href="logout.php" class="sidebar-link text-danger">
+            <a href="<?php echo $baseUrl; ?>logout.php" class="sidebar-link text-danger">
                 <i class="fa-solid fa-arrow-right-from-bracket"></i>
                 <span>Cerrar sesión</span>
             </a>

@@ -82,7 +82,7 @@ include 'includes/sidebar.php';
 
         <div class="row g-4">
             <div class="col-md-3">
-                <a href="Mantproductos.php" class="card-dashboard">
+                <a href="/Sistema_Admin/Mantproductos.php" class="card-dashboard">
                     <i class="fa-solid fa-toolbox"></i>
                     <h5>Mantenimientos</h5>
                     <p>Gestionar catálogos y configuraciones del sistema</p>
@@ -96,7 +96,7 @@ include 'includes/sidebar.php';
                 </div>
             </div>
             <div class="col-md-3">
-                <a href="Consulta_departamento.php" class="card-dashboard">
+                <a href="/Sistema_Admin/Consultas/Consulta_departamento.php" class="card-dashboard">
                     <i class="fa-solid fa-search"></i>
                     <h5>Consultas</h5>
                     <p>Buscar y consultar información del sistema</p>
@@ -156,11 +156,11 @@ include 'includes/sidebar.php';
         <div class="quick-actions">
             <h3 class="section-title">Acciones Rápidas</h3>
             <div class="action-buttons">
-                <a href="Mantproductos.php" class="action-btn">
+                <a href="/Sistema_Admin/Mantproductos.php" class="action-btn">
                     <i class="fa-solid fa-plus"></i>
                     <span>Nuevo Producto</span>
                 </a>
-                <a href="MantAlmacen.php" class="action-btn">
+                <a href="/Sistema_Admin/MantAlmacen.php" class="action-btn">
                     <i class="fa-solid fa-warehouse"></i>
                     <span>Nuevo Almacén</span>
                 </a>
