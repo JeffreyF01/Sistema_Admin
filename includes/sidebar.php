@@ -6,7 +6,8 @@
         'MantDepartamento.php','MantGrupo.php','MantTiposMov.php'
     ];
     $consultaPages = [
-        'Consulta_departamento.php'
+        'Consulta_departamento.php',
+        'Consulta_ubicacion.php'
     ];
     $isDashboard = ($current === 'dashboard.php');
     $isMantenimiento = in_array($current, $mantenimientoPages, true);
@@ -80,6 +81,10 @@
                 <a href="<?php echo $baseUrl; ?>Consultas/Consulta_departamento.php" class="submenu-link <?php echo $current === 'Consulta_departamento.php' ? 'active' : ''; ?>">
                     <i class="fa-solid fa-building"></i>
                     <span>Departamentos</span>
+                </a>
+                <a href="<?php echo $baseUrl; ?>Consultas/Consulta_ubicacion.php" class="submenu-link <?php echo $current === 'Consulta_ubicacion.php' ? 'active' : ''; ?>">
+                    <i class="fa-solid fa-location-dot"></i>
+                    <span>Ubicaciones</span>
                 </a>
                 <!-- Futuras consultas
                 <a href="#" class="submenu-link">
