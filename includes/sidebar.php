@@ -5,16 +5,21 @@
         'Mantproductos.php','MantAlmacen.php','MantUbicacion.php',
         'MantDepartamento.php','MantGrupo.php','MantTiposMov.php'
     ];
+    $procesoPages = [
+        'MantFacturacion.php','Factura_listar.php'
+    ];
     $consultaPages = [
         'Consulta_departamento.php',
         'Consulta_ubicacion.php',
         'Consulta_almacen.php',
         'Consulta_grupo.php',
         'Consulta_tiposmov.php',
-        'Consulta_producto.php'
+        'Consulta_producto.php',
+        'Consulta_factura.php'
     ];
     $isDashboard = ($current === 'dashboard.php');
     $isMantenimiento = in_array($current, $mantenimientoPages, true);
+    $isProceso = in_array($current, $procesoPages, true);
     $isConsulta = in_array($current, $consultaPages, true);
 ?>
 
@@ -69,10 +74,21 @@
         </div>
 
         <div class="sidebar-item">
-            <a href="#" class="sidebar-link">
+            <a href="#" class="sidebar-link<?php echo $isProceso ? ' active' : ''; ?>" data-toggle="submenu" data-target="procesosMenu">
                 <i class="fa-solid fa-gears"></i>
                 <span>Procesos</span>
+                <i class="fa-solid fa-chevron-down ms-auto chevron <?php echo $isProceso ? 'fa-rotate-180' : ''; ?>"></i>
             </a>
+            <div class="submenu <?php echo $isProceso ? 'show' : ''; ?>" id="procesosMenu">
+                <a href="<?php echo $baseUrl; ?>Procesos/MantFacturacion.php" class="submenu-link <?php echo $current === 'MantFacturacion.php' ? 'active' : ''; ?>">
+                    <i class="fa-solid fa-file-invoice-dollar"></i>
+                    <span>Facturación</span>
+                </a>
+                <a href="<?php echo $baseUrl; ?>Procesos/Factura_listar.php" class="submenu-link <?php echo $current === 'Factura_listar.php' ? 'active' : ''; ?>">
+                    <i class="fa-solid fa-list"></i>
+                    <span>Listado de Facturas</span>
+                </a>
+            </div>
         </div>
 
         <div class="sidebar-item">
@@ -105,6 +121,10 @@
                 <a href="<?php echo $baseUrl; ?>Consultas/Consulta_producto.php" class="submenu-link <?php echo $current === 'Consulta_producto.php' ? 'active' : ''; ?>">
                     <i class="fa-solid fa-box"></i>
                     <span>Productos</span>
+                </a>
+                <a href="<?php echo $baseUrl; ?>Consultas/Consulta_factura.php" class="submenu-link <?php echo $current === 'Consulta_factura.php' ? 'active' : ''; ?>">
+                    <i class="fa-solid fa-file-invoice-dollar"></i>
+                    <span>Facturas</span>
                 </a>
                 <!-- Futuras consultas
                 <a href="#" class="submenu-link">
