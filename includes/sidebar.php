@@ -21,6 +21,7 @@
     $isMantenimiento = in_array($current, $mantenimientoPages, true);
     $isProceso = in_array($current, $procesoPages, true);
     $isConsulta = in_array($current, $consultaPages, true);
+    $isConfiguracion = ($current === 'Configuracion.php');
 ?>
 
 <div class="sidebar">
@@ -143,6 +144,13 @@
             <a href="#" class="sidebar-link">
                 <i class="fa-solid fa-chart-pie"></i>
                 <span>Reportes</span>
+            </a>
+        </div>
+
+        <div class="sidebar-item">
+            <a href="<?php echo $baseUrl; ?>Configuracion.php" class="sidebar-link <?php echo $isConfiguracion ? 'active' : ''; ?>">
+                <i class="fa-solid fa-sliders"></i>
+                <span>Configuración</span>
             </a>
         </div>
 
