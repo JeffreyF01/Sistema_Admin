@@ -26,3 +26,65 @@
 </head>
 <body>
 <div class="app-container">
+    <script>
+    (function() {
+        const storageKey = 'theme';
+        const body = document.body;
+
+        function setButtonState(btn, icon, label, isDark) {
+            if (!btn || !icon || !label) return;
+            if (isDark) {
+                icon.className = 'fa-solid fa-sun';
+                label.textContent = 'Claro';
+            } else {
+                icon.className = 'fa-solid fa-moon';
+                label.textContent = 'Oscuro';
+            }
+        }
+
+        function applyTheme(theme) {
+            const isDark = theme === 'dark';
+            body.classList.toggle('dark-mode', isDark);
+            const btn = document.getElementById('themeToggle');
+            const icon = document.getElementById('themeIcon');
+            const label = document.getElementById('themeLabel');
+            setButtonState(btn, icon, label, isDark);
+        }
+
+        const saved = localStorage.getItem(storageKey);
+        const initial = saved ? saved : 'light';
+        applyTheme(initial);
+
+        document.addEventListener('click', function(e) {
+            const btn = document.getElementById('themeToggle');
+            if (!btn) return;
+            if (btn.contains(e.target)) {
+                const next = body.classList.contains('dark-mode') ? 'light' : 'dark';
+                localStorage.setItem(storageKey, next);
+                applyTheme(next);
+            }
+        });
+        document.addEventListener('DOMContentLoaded', function() {
+            const userInfo = document.querySelector('.main-header .user-info');
+            if (!userInfo || document.getElementById('themeToggle')) return;
+            const userAvatar = userInfo.querySelector('.user-avatar');
+            const btn = document.createElement('button');
+            btn.id = 'themeToggle';
+            btn.className = 'theme-toggle-btn header-inline';
+            btn.title = 'Cambiar tema';
+            btn.innerHTML = '<i id="themeIcon" class="fa-solid fa-moon"></i><span id="themeLabel">Oscuro</span>';
+            if (userAvatar) {
+                userInfo.insertBefore(btn, userAvatar);
+            } else {
+                userInfo.appendChild(btn);
+            }
+            const isDark = body.classList.contains('dark-mode');
+            const icon = document.getElementById('themeIcon');
+            const label = document.getElementById('themeLabel');
+            if (icon && label) {
+                if (isDark) { icon.className = 'fa-solid fa-sun'; label.textContent = 'Claro'; }
+                else { icon.className = 'fa-solid fa-moon'; label.textContent = 'Oscuro'; }
+            }
+        });
+    })();
+    </script>
