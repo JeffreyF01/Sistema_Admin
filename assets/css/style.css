@@ -498,6 +498,12 @@ body {
     height: 100%;
 }
 
+.config-section {
+    background: #f8f9fa;
+    padding: 30px;
+    border-radius: 15px;
+}
+
 .stat-card:hover {
     transform: translateY(-5px);
     box-shadow: 0 10px 25px rgba(0,0,0,0.12);
