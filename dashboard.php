@@ -1,10 +1,14 @@
 <?php
+// dashboard.php
 session_start();
 if (!isset($_SESSION['usuario'])) {
     header("Location: index.html");
     exit();
 }
 $usuario = $_SESSION['usuario'];
+
+// permisos disponibles
+$perms = $_SESSION['permisos'] ?? [];
 
 require_once 'conexion.php';
 
@@ -60,7 +64,7 @@ include 'includes/sidebar.php';
                     <div class="user-info">
                         <div class="user-avatar"><?php echo strtoupper(substr($usuario, 0, 1)); ?></div>
                         <div class="user-details">
-                            <div class="username"><?php echo $usuario; ?></div>
+                            <div class="username"><?php echo htmlspecialchars($usuario); ?></div>
                             <div class="role">Administrador</div>
                         </div>
                     </div>
@@ -167,9 +171,6 @@ include 'includes/sidebar.php';
             </div>
         </div>
     </div>
-
-    
-
 </div>
 
 <?php include 'includes/footer.php'; ?>
