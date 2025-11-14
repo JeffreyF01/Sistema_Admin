@@ -103,11 +103,11 @@ include "includes/sidebar.php";
                                     </div>
                                     <div class="col-md-3">
                                         <label class="form-label">Stock</label>
-                                        <input type="number" name="stock" id="stock" class="form-control" required>
+                                        <input type="number" step="1" min="0" name="stock" id="stock" class="form-control" required>
                                     </div>
                                     <div class="col-md-3">
                                         <label class="form-label">Stock Mín.</label>
-                                        <input type="number" name="stock_min" id="stock_min" class="form-control" required>
+                                        <input type="number" step="1" min="0" name="stock_min" id="stock_min" class="form-control" required>
                                     </div>
                                     <div class="col-md-3">
                                         <label class="form-label">Estado</label>

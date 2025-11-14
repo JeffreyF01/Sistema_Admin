@@ -53,7 +53,7 @@ include "includes/sidebar.php";
 
                                 <div class="mb-3">
                                     <label class="form-label">Días de Plazo</label>
-                                    <input type="number" name="dias_plazo" id="dias_plazo" class="form-control" min="0" required>
+                                    <input type="number" step="1" name="dias_plazo" id="dias_plazo" class="form-control" min="0" required>
                                 </div>
 
                                 <div class="mb-3">

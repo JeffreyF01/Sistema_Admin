@@ -107,9 +107,12 @@ function guardarFactura($conexion, $data, $usuario_id) {
             $stmt_check->execute();
             $result_check = $stmt_check->get_result();
             $producto = $result_check->fetch_assoc();
+            
+            $stock_disponible = floatval($producto['stock']);
+            $cantidad_requerida = floatval($item['cantidad']);
 
-            if ($producto['stock'] < $item['cantidad']) {
-                throw new Exception("Stock insuficiente para el producto ID: " . $item['producto_id']);
+            if ($stock_disponible < $cantidad_requerida) {
+                throw new Exception("Stock insuficiente para el producto ID: " . $item['producto_id'] . ". Disponible: " . $stock_disponible);
             }
 
             // Insertar detalle
@@ -295,6 +298,9 @@ function listarProductos($conexion) {
     $productos = [];
 
     while($row = $result->fetch_assoc()) {
+        // Parsear valores numéricos para asegurar formato correcto
+        $row['stock'] = floatval($row['stock']);
+        $row['precio_venta'] = floatval($row['precio_venta']);
         $productos[] = $row;
     }
 

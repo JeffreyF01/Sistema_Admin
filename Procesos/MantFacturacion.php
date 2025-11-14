@@ -125,7 +125,7 @@ include '../includes/sidebar.php';
                                 </div>
                                 <div class="col-md-2">
                                     <label for="cantidad" class="form-label">Cantidad</label>
-                                    <input type="number" class="form-control form-control-custom" id="cantidad" min="0.01" step="0.01" value="1">
+                                    <input type="number" class="form-control form-control-custom" id="cantidad" min="1" step="1" value="1">
                                 </div>
                                 <div class="col-md-2">
                                     <label for="precio" class="form-label">Precio Unit.</label>
@@ -147,11 +147,11 @@ include '../includes/sidebar.php';
                                 <table class="table table-sm table-bordered" id="detalleTable">
                                     <thead class="table-light">
                                         <tr>
-                                            <th style="width: 40%;">Producto</th>
-                                            <th style="width: 15%;">Cantidad</th>
-                                            <th style="width: 15%;">Precio Unit.</th>
-                                            <th style="width: 20%;">Subtotal</th>
-                                            <th style="width: 10%;">Acción</th>
+                                            <th style="width: 35%;">Producto</th>
+                                            <th style="width: 12%;">Cantidad</th>
+                                            <th style="width: 13%;">Precio Unit.</th>
+                                            <th style="width: 15%;">Subtotal</th>
+                                            <th style="width: 25%;">Acciones</th>
                                         </tr>
                                     </thead>
                                     <tbody></tbody>
@@ -252,8 +252,9 @@ $(document).ready(function() {
         }
 
         // Verificar stock disponible
-        if (cantidad > producto.stock) {
-            Swal.fire('Error', `Stock insuficiente. Disponible: ${producto.stock}`, 'error');
+        const stockDisponible = parseFloat(producto.stock) || 0;
+        if (cantidad > stockDisponible) {
+            Swal.fire('Error', `Stock insuficiente. Disponible: ${stockDisponible}`, 'error');
             return;
         }
 
@@ -261,8 +262,8 @@ $(document).ready(function() {
         const existente = detalleItems.find(item => item.producto_id == productoId);
         if (existente) {
             const nuevaCantidad = existente.cantidad + cantidad;
-            if (nuevaCantidad > producto.stock) {
-                Swal.fire('Error', `Stock insuficiente. Disponible: ${producto.stock}`, 'error');
+            if (nuevaCantidad > stockDisponible) {
+                Swal.fire('Error', `Stock insuficiente. Disponible: ${stockDisponible}`, 'error');
                 return;
             }
             existente.cantidad = nuevaCantidad;
@@ -424,8 +425,10 @@ $(document).ready(function() {
                     productosList = response.data;
                     let options = '<option value="">Seleccione un producto...</option>';
                     response.data.forEach(function(producto) {
-                        options += `<option value="${producto.id_productos}" data-precio="${producto.precio_venta}" data-stock="${producto.stock}">
-                            ${producto.nombre} - Stock: ${producto.stock} - $${parseFloat(producto.precio_venta).toFixed(2)}
+                        const stock = parseFloat(producto.stock) || 0;
+                        const precio = parseFloat(producto.precio_venta) || 0;
+                        options += `<option value="${producto.id_productos}" data-precio="${precio}" data-stock="${stock}">
+                            ${producto.nombre} - Stock: ${stock} - $${precio.toFixed(2)}
                         </option>`;
                     });
                     $('#productoId').html(options);
@@ -468,15 +471,26 @@ $(document).ready(function() {
 
         detalleItems.forEach(function(item, index) {
             total += item.subtotal;
+            const cantidad = parseFloat(item.cantidad) || 0;
+            const precioUnit = parseFloat(item.precio_unitario) || 0;
+            const subtotal = parseFloat(item.subtotal) || 0;
             html += `<tr>
                 <td>${item.nombre}</td>
-                <td>${item.cantidad}</td>
-                <td>$${item.precio_unitario.toFixed(2)}</td>
-                <td>$${item.subtotal.toFixed(2)}</td>
+                <td>${cantidad}</td>
+                <td>$${precioUnit.toFixed(2)}</td>
+                <td>$${subtotal.toFixed(2)}</td>
                 <td>
-                    <button type="button" class="btn btn-sm btn-danger" onclick="eliminarItem(${index})">
-                        <i class="fa-solid fa-trash"></i>
-                    </button>
+                    <div class="btn-group btn-group-sm" role="group">
+                        <button type="button" class="btn btn-outline-primary" onclick="decrementarItem(${index})" title="Disminuir cantidad">
+                            <i class="fa-solid fa-minus"></i>
+                        </button>
+                        <button type="button" class="btn btn-outline-success" onclick="incrementarItem(${index})" title="Aumentar cantidad">
+                            <i class="fa-solid fa-plus"></i>
+                        </button>
+                        <button type="button" class="btn btn-outline-danger" onclick="eliminarItem(${index})" title="Eliminar producto">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </div>
                 </td>
             </tr>`;
         });
@@ -484,6 +498,52 @@ $(document).ready(function() {
         $('#detalleTable tbody').html(html || '<tr><td colspan="5" class="text-center">No hay productos agregados</td></tr>');
         $('#totalFactura').text('$' + total.toFixed(2));
     }
+
+    window.incrementarItem = function(index) {
+        const item = detalleItems[index];
+        const producto = productosList.find(p => p.id_productos == item.producto_id);
+        
+        if (!producto) {
+            Swal.fire('Error', 'Producto no encontrado', 'error');
+            return;
+        }
+
+        const nuevaCantidad = item.cantidad + 1;
+        const stockDisponible = parseFloat(producto.stock) || 0;
+        
+        if (nuevaCantidad > stockDisponible) {
+            Swal.fire('Error', `Stock insuficiente. Disponible: ${stockDisponible}`, 'warning');
+            return;
+        }
+
+        item.cantidad = nuevaCantidad;
+        item.subtotal = item.cantidad * item.precio_unitario;
+        actualizarTablaDetalle();
+    };
+
+    window.decrementarItem = function(index) {
+        const item = detalleItems[index];
+        
+        if (item.cantidad <= 1) {
+            Swal.fire({
+                title: '¿Eliminar producto?',
+                text: 'La cantidad mínima es 1. ¿Desea eliminar el producto del detalle?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Sí, eliminar',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    eliminarItem(index);
+                }
+            });
+            return;
+        }
+
+        item.cantidad -= 1;
+        item.subtotal = item.cantidad * item.precio_unitario;
+        actualizarTablaDetalle();
+    };
 
     window.eliminarItem = function(index) {
         detalleItems.splice(index, 1);
