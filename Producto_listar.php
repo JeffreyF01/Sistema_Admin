@@ -27,7 +27,7 @@ while($row = $result->fetch_assoc()){
     <td><?= htmlspecialchars($row['nombre']) ?></td>
     <td><?= htmlspecialchars($row['departamento']) ?></td>
     <td><?= htmlspecialchars($row['grupo']) ?></td>
-    <td><?= $row['stock'] ?></td>
+    <td><?= number_format($row['stock'], 0) ?></td>
     <td><?= $estado ?></td>
     <td>
         <div class="d-flex gap-2 justify-content-center">
