@@ -98,7 +98,10 @@ function nav_link($url, $icon, $label, $allowed, $isActive = false) {
                 <?php
                 // Facturación -> permiso inv_facturacion
                 echo nav_link($baseUrl.'Procesos/MantFacturacion.php', 'fa-solid fa-file-invoice-dollar', 'Facturación', ($perms['inv_facturacion'] ?? 0), $current === 'MantFacturacion.php');
+<<<<<<< HEAD
                 echo nav_link($baseUrl.'Procesos/MantCotizacion.php', 'fa-solid fa-file-invoice-dollar', 'Cotización', ($perms['inv_cotizaciones'] ?? 0), $current === 'MantCotizacion.php');
+=======
+>>>>>>> 7af223f (Arreglos en el proceso Factura)
                 ?>
             </div>
         </div>

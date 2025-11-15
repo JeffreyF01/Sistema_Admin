@@ -34,13 +34,15 @@ include '../includes/sidebar.php';
     <div class="content-area">
         <div class="container-fluid">
             <!-- Botón para nueva factura -->
-            <div class="mb-3">
-                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#facturaModal">
-                    <i class="fa-solid fa-plus me-2"></i>Nueva Factura
-                </button>
-                <a href="Factura_listar.php" class="btn btn-secondary">
-                    <i class="fa-solid fa-list me-2"></i>Ver Todas las Facturas
-                </a>
+            <div class="row mb-3">
+                <div class="col-12 d-flex justify-content-end gap-2">
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#facturaModal">
+                        <i class="fa-solid fa-plus me-2"></i>Nueva Factura
+                    </button>
+                    <a href="../Consultas/Consulta_factura.php" class="btn btn-secondary">
+                        <i class="fa-solid fa-magnifying-glass me-2"></i>Ir a Consulta de Facturas
+                    </a>
+                </div>
             </div>
 
             <!-- Tabla de Facturas -->
@@ -187,6 +189,47 @@ include '../includes/sidebar.php';
     </div>
 </div>
 
+<!-- Modal: Detalle de Factura (solo visualización) -->
+<div class="modal fade" id="detalleFacturaModal" tabindex="-1" aria-labelledby="detalleFacturaLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="detalleFacturaLabel"><i class="fa-solid fa-file-invoice me-2"></i>Detalle de Factura</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row g-2 mb-3">
+                    <div class="col-md-4"><strong>N°:</strong> <span id="df-numero"></span></div>
+                    <div class="col-md-4"><strong>Fecha:</strong> <span id="df-fecha"></span></div>
+                    <div class="col-md-4"><strong>Usuario:</strong> <span id="df-usuario"></span></div>
+                    <div class="col-md-6"><strong>Cliente:</strong> <span id="df-cliente"></span></div>
+                    <div class="col-md-6"><strong>Condición:</strong> <span id="df-condicion"></span></div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-sm table-bordered">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Producto</th>
+                                <th style="width: 15%;" class="text-end">Cantidad</th>
+                                <th style="width: 20%;" class="text-end">Precio Unit.</th>
+                                <th style="width: 20%;" class="text-end">Subtotal</th>
+                            </tr>
+                        </thead>
+                        <tbody id="df-detalle"></tbody>
+                    </table>
+                </div>
+                <div class="d-flex justify-content-end mt-2">
+                    <h5>Total: <span id="df-total" class="text-primary"></span></h5>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-primary" id="df-imprimir"><i class="fa-solid fa-print me-2"></i>Imprimir</button>
+            </div>
+        </div>
+    </div>
+    </div>
+
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
 $(document).ready(function() {
@@ -211,6 +254,8 @@ $(document).ready(function() {
             generarNumeroDocumento();
             $('#fecha').val(new Date().toISOString().split('T')[0]);
         }
+        // Asegurar que los productos y su stock estén actualizados al abrir
+        cargarProductos();
     });
 
     // Limpiar modal al cerrar
@@ -330,6 +375,8 @@ $(document).ready(function() {
                     });
                     $('#facturaModal').modal('hide');
                     cargarFacturas();
+                    // Refrescar catálogo de productos para que el stock refleje la última factura
+                    cargarProductos();
                 } else {
                     Swal.fire('Error', response.message, 'error');
                 }
@@ -555,7 +602,52 @@ $(document).ready(function() {
     };
 
     window.verFactura = function(id) {
-        window.location.href = 'Factura_listar.php?id=' + id;
+        $.ajax({
+            url: 'Factura_ajax.php',
+            type: 'POST',
+            data: { accion: 'obtener', id: id },
+            success: function(response) {
+                if (!response.success) {
+                    Swal.fire('Error', response.message || 'No se pudo cargar la factura', 'error');
+                    return;
+                }
+                const f = response.data;
+                $('#df-numero').text(f.numero_documento);
+                $('#df-fecha').text(new Date(f.fecha).toLocaleDateString());
+                $('#df-usuario').text(f.usuario_nombre || '');
+                $('#df-cliente').text(`${f.cliente_nombre} ${f.doc_identidad ? '('+f.doc_identidad+')' : ''}`);
+                $('#df-condicion').text(`${f.condicion_nombre} ${f.dias_plazo ? '('+f.dias_plazo+' días)' : ''}`);
+
+                const $tbody = $('#df-detalle');
+                $tbody.empty();
+                let total = 0;
+                (f.detalle || []).forEach(function(it){
+                    const cantidad = parseFloat(it.cantidad) || 0;
+                    const precio = parseFloat(it.precio_unitario) || 0;
+                    const subtotal = cantidad * precio;
+                    total += subtotal;
+                    $tbody.append(`
+                        <tr>
+                            <td>${it.producto_nombre || ''}</td>
+                            <td class="text-end">${cantidad.toLocaleString(undefined,{maximumFractionDigits:2})}</td>
+                            <td class="text-end">$${precio.toFixed(2)}</td>
+                            <td class="text-end">$${subtotal.toFixed(2)}</td>
+                        </tr>
+                    `);
+                });
+                $('#df-total').text(`$${total.toFixed(2)}`);
+
+                $('#df-imprimir').off('click').on('click', function(){
+                    imprimirFactura(id);
+                });
+
+                const modal = new bootstrap.Modal(document.getElementById('detalleFacturaModal'));
+                modal.show();
+            },
+            error: function() {
+                Swal.fire('Error', 'Error al obtener el detalle de la factura', 'error');
+            }
+        });
     };
 
     window.anularFactura = function(id) {
