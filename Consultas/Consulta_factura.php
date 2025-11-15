@@ -117,7 +117,7 @@ include '../includes/sidebar.php';
                                                      <i class='fas fa-circle me-1' style='font-size:8px;color:#dc3545;'></i>Anulado
                                                    </span>";
                                             
-                                            echo "<tr data-activo='{$row['activo']}' data-fecha='{$row['fecha']}'>";
+                                            echo "<tr data-id='{$row['id_facturas']}' data-activo='{$row['activo']}' data-fecha='{$row['fecha']}'>";
                                             echo "<td><strong>" . htmlspecialchars($row['numero_documento']) . "</strong></td>";
                                             echo "<td>" . htmlspecialchars($row['cliente_nombre']) . "</td>";
                                             echo "<td>" . date('d/m/Y', strtotime($row['fecha'])) . "</td>";
@@ -151,6 +151,49 @@ include '../includes/sidebar.php';
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+        // Modal para detalle
+        const detalleModalHtml = `
+        <div class="modal fade" id="detalleFacturaModal" tabindex="-1" aria-labelledby="detalleFacturaLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="detalleFacturaLabel"><i class="fa-solid fa-file-invoice me-2"></i>Detalle de Factura</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row g-2 mb-3">
+                            <div class="col-md-4"><strong>N°:</strong> <span id="df-numero"></span></div>
+                            <div class="col-md-4"><strong>Fecha:</strong> <span id="df-fecha"></span></div>
+                            <div class="col-md-4"><strong>Usuario:</strong> <span id="df-usuario"></span></div>
+                            <div class="col-md-6"><strong>Cliente:</strong> <span id="df-cliente"></span></div>
+                            <div class="col-md-6"><strong>Condición:</strong> <span id="df-condicion"></span></div>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-sm table-bordered">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Producto</th>
+                                        <th style="width: 15%;" class="text-end">Cantidad</th>
+                                        <th style="width: 20%;" class="text-end">Precio Unit.</th>
+                                        <th style="width: 20%;" class="text-end">Subtotal</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="df-detalle"></tbody>
+                            </table>
+                        </div>
+                        <div class="d-flex justify-content-end mt-2">
+                            <h5>Total: <span id="df-total" class="text-primary"></span></h5>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                        <button type="button" class="btn btn-primary" id="df-imprimir"><i class="fa-solid fa-print me-2"></i>Imprimir</button>
+                    </div>
+                </div>
+            </div>
+        </div>`;
+        document.body.insertAdjacentHTML('beforeend', detalleModalHtml);
+
     const searchInput = document.getElementById('searchInput');
     const resultCount = document.getElementById('resultCount');
     const filtroEstado = document.getElementById('filtroEstado');
@@ -204,6 +247,71 @@ document.addEventListener('DOMContentLoaded', function() {
     filtroFechaDesde.addEventListener('change', aplicarFiltros);
     filtroFechaHasta.addEventListener('change', aplicarFiltros);
     searchInput.focus();
+
+    // Click para ver detalle
+    document.querySelector('#facturaTable tbody')?.addEventListener('click', function(e){
+        const tr = e.target.closest('tr');
+        if (!tr) return;
+        const id = tr.getAttribute('data-id');
+        if (!id) return;
+        cargarDetalle(id);
+    });
+
+    // Soporte para abrir por parámetro ?id=123
+    const params = new URLSearchParams(window.location.search);
+    const idParam = params.get('id');
+    if (idParam) {
+        cargarDetalle(idParam);
+    }
+
+    function cargarDetalle(id){
+        fetch('../Procesos/Factura_ajax.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ accion: 'obtener', id: parseInt(id, 10) })
+        })
+        .then(r => r.json())
+        .then(resp => {
+            if (!resp.success) throw new Error(resp.message || 'Error al obtener la factura');
+            const f = resp.data;
+            document.getElementById('df-numero').textContent = f.numero_documento;
+            document.getElementById('df-fecha').textContent = new Date(f.fecha).toLocaleDateString();
+            document.getElementById('df-usuario').textContent = f.usuario_nombre || '';
+            document.getElementById('df-cliente').textContent = `${f.cliente_nombre} (${f.doc_identidad || ''})`;
+            document.getElementById('df-condicion').textContent = `${f.condicion_nombre} ${f.dias_plazo ? '('+f.dias_plazo+' días)' : ''}`;
+
+            const tbody = document.getElementById('df-detalle');
+            tbody.innerHTML = '';
+            let total = 0;
+            (f.detalle || []).forEach(it => {
+                const cantidad = parseFloat(it.cantidad) || 0;
+                const precio = parseFloat(it.precio_unitario) || 0;
+                const subtotal = cantidad * precio;
+                total += subtotal;
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${it.producto_nombre || ''}</td>
+                    <td class="text-end">${cantidad.toLocaleString(undefined,{maximumFractionDigits:2})}</td>
+                    <td class="text-end">$${precio.toFixed(2)}</td>
+                    <td class="text-end">$${subtotal.toFixed(2)}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+            document.getElementById('df-total').textContent = `$${total.toFixed(2)}`;
+
+            const modalEl = document.getElementById('detalleFacturaModal');
+            const bsModal = new bootstrap.Modal(modalEl);
+            bsModal.show();
+
+            document.getElementById('df-imprimir').onclick = () => {
+                window.open(`../Procesos/Factura_imprimir.php?id=${id}`, '_blank');
+            };
+        })
+        .catch(err => {
+            console.error(err);
+            alert(err.message || 'Error al obtener el detalle de la factura');
+        });
+    }
 });
 </script>
 <?php include '../includes/footer.php'; ?>
