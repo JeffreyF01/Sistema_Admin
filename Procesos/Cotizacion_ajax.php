@@ -175,20 +175,26 @@ if ($accion === 'anular' && $id_param !== null) {
 
 if ($accion === 'convertir_a_factura' && $id_param !== null) {
     $id = (int)$id_param;
+
+    // obtener cabecera cotizacion
     $r = $conexion->query("SELECT * FROM cotizacion WHERE id_cotizaciones = " . intval($id) . " LIMIT 1");
     if ($r->num_rows === 0) json_resp(false, ['message' => 'Cotización no encontrada']);
     $cot = $r->fetch_assoc();
 
+    // si ya está bloqueada / convertida
     if ((int)$cot['activo'] === 0) {
         json_resp(false, ['message' => 'La cotización ya fue convertida / está bloqueada.']);
     }
 
+    // obtener detalle
     $detRes = $conexion->query("SELECT * FROM cotizacion_detalle WHERE cotizacion_id = " . intval($id));
     $det = [];
     while ($d = $detRes->fetch_assoc()) $det[] = $d;
 
     $conexion->begin_transaction();
     try {
+
+        // condición de pago
         $condRes = $conexion->query("SELECT id_condiciones_pago FROM condicion_pago WHERE activo = 1 LIMIT 1");
         if ($condRes && $condRes->num_rows > 0) {
             $condRow = $condRes->fetch_assoc();
@@ -197,22 +203,44 @@ if ($accion === 'convertir_a_factura' && $id_param !== null) {
             $condicion_id = 1;
         }
 
-        $stmt = $conexion->prepare("INSERT INTO factura (numero_documento, cliente_id, usuario_id, fecha, condicion_id, total, activo) VALUES (?, ?, ?, ?, ?, ?, 1)");
+        // insertar factura
+        $stmt = $conexion->prepare("
+            INSERT INTO factura (numero_documento, cliente_id, usuario_id, fecha, condicion_id, total, activo) 
+            VALUES (?, ?, ?, ?, ?, ?, 1)
+        ");
+
         $numero_fact = 'FAC-' . date('YmdHis');
         $usuario_id = $_SESSION['user_info']['id_usuarios'] ?? null;
         $fecha = date('Y-m-d');
         $total = floatval($cot['total']);
+
         $stmt->bind_param("siisid", $numero_fact, $cot['cliente_id'], $usuario_id, $fecha, $condicion_id, $total);
-        if (!$stmt->execute()) throw new Exception('Error insert facturas: ' . $conexion->error);
+        if (!$stmt->execute()) throw new Exception('Error insert factura: ' . $conexion->error);
         $factura_id = $conexion->insert_id;
 
-        $stmtDet = $conexion->prepare("INSERT INTO factura_detalle (factura_id, producto_id, cantidad, precio_unitario, activo) VALUES (?, ?, ?, ?, 1)");
+        // insertar detalle y RESTAR INVENTARIO
+        $stmtDet = $conexion->prepare("
+            INSERT INTO factura_detalle (factura_id, producto_id, cantidad, precio_unitario, activo) 
+            VALUES (?, ?, ?, ?, 1)
+        ");
+
         foreach ($det as $it) {
+
             $p = (int)$it['producto_id'];
             $cant = floatval($it['cantidad']);
             $prec = floatval($it['precio_unitario']);
+
+            // insertar detalle
             $stmtDet->bind_param("iidd", $factura_id, $p, $cant, $prec);
             if (!$stmtDet->execute()) throw new Exception('Error insert factura_detalle: ' . $conexion->error);
+
+            $up = $conexion->prepare("
+                UPDATE producto 
+                SET stock = stock - ? 
+                WHERE id_productos = ? LIMIT 1
+            ");
+            $up->bind_param("di", $cant, $p);
+            if (!$up->execute()) throw new Exception('Error restando inventario: ' . $conexion->error);
         }
 
         $q = $conexion->prepare("UPDATE cotizacion SET activo = 0 WHERE id_cotizaciones = ? LIMIT 1");
@@ -220,11 +248,16 @@ if ($accion === 'convertir_a_factura' && $id_param !== null) {
         if (!$q->execute()) throw new Exception('Error marcando cotización como convertida: ' . $conexion->error);
 
         $conexion->commit();
-        json_resp(true, ['message' => 'Cotización convertida a factura', 'factura_id' => $factura_id]);
+        json_resp(true, [
+            'message' => 'Cotización convertida a factura y stock actualizado',
+            'factura_id' => $factura_id
+        ]);
+
     } catch (Exception $e) {
         $conexion->rollback();
         json_resp(false, ['message' => 'No se pudo convertir: ' . $e->getMessage()]);
     }
 }
+
 
 json_resp(false, ['message' => 'Acción inválida']);
