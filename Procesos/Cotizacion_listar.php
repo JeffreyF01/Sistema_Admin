@@ -48,7 +48,8 @@ $sql = "SELECT c.id_cotizaciones, c.numero_documento, cli.nombre AS cliente_nomb
 $res = $conexion->query($sql);
 if($res->num_rows > 0){
     while($r = $res->fetch_assoc()){
-        $estado = $r['activo']==1 ? '<span class="badge bg-success">Activo</span>' : '<span class="badge bg-danger">Anulado</span>';
+        $estado = $r['activo']==1 ? "<span style='background-color:#d1e7dd;color:#0f5132;padding:6px 12px;border-radius:20px;font-weight:500;'><i class='fas fa-circle me-1' style='font-size:8px;color:#198754;'></i>Activo</span>"
+        : "<span style='background-color:#f8d7da;color:#842029;padding:6px 12px;border-radius:20px;font-weight:500;'><i class='fas fa-circle me-1' style='font-size:8px;color:#dc3545;'></i>Anulado</span>";
         echo "<tr>
             <td>{$r['id_cotizaciones']}</td>
             <td>{$r['numero_documento']}</td>

@@ -13,9 +13,9 @@ if(!$res){
 while($row = $res->fetch_assoc()){
     $id = (int)$row['id_proveedores'];
 
-    $estado = $row['activo']
-        ? "<span class='badge bg-success p-2 px-3'>Activo</span>"
-        : "<span class='badge bg-danger p-2 px-3'>Inactivo</span>";
+    $estado = $row['activo'] 
+        ? "<span style='background-color:#d1e7dd;color:#0f5132;padding:6px 12px;border-radius:20px;font-weight:500;'><i class='fas fa-circle me-1' style='font-size:8px;color:#198754;'></i>Activo</span>"
+        : "<span style='background-color:#f8d7da;color:#842029;padding:6px 12px;border-radius:20px;font-weight:500;'><i class='fas fa-circle me-1' style='font-size:8px;color:#dc3545;'></i>Inactivo</span>";
 
     echo "
     <tr>

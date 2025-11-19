@@ -3,11 +3,11 @@ require "conexion.php";
 
 if(isset($_POST['eliminar'])){
     $id = $_POST['id_monedas'];
-    $sql = "DELETE FROM usuario_moneda WHERE id_monedas = $id"; // Si tu tabla se llama diferente, cambia aquí
-    if(mysqli_query($conn, $sql)){
+    $sql = "DELETE FROM moneda WHERE id_monedas = $id"; // Si tu tabla se llama diferente, cambia aquí
+    if(mysqli_query($conexion, $sql)){
         echo "ok";
     } else {
-        echo mysqli_error($conn);
+        echo mysqli_error($conexion);
     }
     exit();
 }

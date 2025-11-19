@@ -4,10 +4,10 @@ require "conexion.php";
 if(isset($_POST['eliminar'])){
     $id = $_POST['id_empresa'];
     $sql = "DELETE FROM empresa WHERE id_empresa = $id";
-    if(mysqli_query($conn, $sql)){
+    if(mysqli_query($conexion, $sql)){
         echo "ok";
     } else {
-        echo mysqli_error($conn);
+        echo mysqli_error($conexion);
     }
     exit();
 }
