@@ -80,6 +80,7 @@ function nav_link($url, $icon, $label, $allowed, $isActive = false) {
                 echo nav_link($baseUrl.'MantUbicacion.php', 'fa-solid fa-location-dot', 'Ubicaciones', ($perms['inv_ubicaciones'] ?? 0), $current === 'MantUbicacion.php');
                 echo nav_link($baseUrl.'MantDepartamento.php', 'fa-solid fa-building', 'Departamentos', ($perms['inv_departamentos'] ?? 0), $current === 'MantDepartamento.php');
                 echo nav_link($baseUrl.'MantGrupo.php', 'fa-solid fa-people-group', 'Grupos', ($perms['inv_grupos'] ?? 0), $current === 'MantGrupo.php');
+                // Tipos de movimiento: dependiente de inv_movimientos o inv_cotizaciones (elige lógica que prefieras)
                 $allowTipos = ($perms['inv_movimientos'] ?? 0) || ($perms['inv_cotizaciones'] ?? 0);
                 echo nav_link($baseUrl.'MantTiposMov.php', 'fa-solid fa-arrows-rotate', 'Tipos de movimiento', $allowTipos, $current === 'MantTiposMov.php');
                 ?>
@@ -98,9 +99,6 @@ function nav_link($url, $icon, $label, $allowed, $isActive = false) {
                 // Facturación -> permiso inv_facturacion
                 echo nav_link($baseUrl.'Procesos/MantFacturacion.php', 'fa-solid fa-file-invoice-dollar', 'Facturación', ($perms['inv_facturacion'] ?? 0), $current === 'MantFacturacion.php');
                 echo nav_link($baseUrl.'Procesos/MantCotizacion.php', 'fa-solid fa-file-invoice-dollar', 'Cotización', ($perms['inv_cotizaciones'] ?? 0), $current === 'MantCotizacion.php');
-                // Listado facturas -> inv_facturacion o inv_consultas
-                $allowFacturaList = ($perms['inv_facturacion'] ?? 0) || ($perms['inv_consultas'] ?? 0);
-                echo nav_link($baseUrl.'Procesos/Factura_listar.php', 'fa-solid fa-list', 'Listado de Facturas', $allowFacturaList, $current === 'Factura_listar.php');
                 ?>
             </div>
         </div>
@@ -157,6 +155,18 @@ function nav_link($url, $icon, $label, $allowed, $isActive = false) {
             $allowConf = ($perms['conf_usuario'] ?? 0) || ($perms['conf_roles'] ?? 0) || ($perms['conf_empresa'] ?? 0) || ($perms['conf_moneda'] ?? 0) || ($perms['conf_condicion'] ?? 0);
             if ($allowConf) {
                 echo '<a href="'.$baseUrl.'CxC.php" class="sidebar-link '.($isCxC ? 'active':'').'"><i class="fa-solid fa-sliders"></i><span>Cuentas por Cobrar</span></a>';
+            } else {
+                echo '<a href="#" class="sidebar-link" style="opacity:0.45;pointer-events:none;cursor:not-allowed;" title="Acceso denegado"><i class="fa-solid fa-sliders"></i><span>Cuentas Por Cobrar</span></a>';
+            }
+            ?>
+        </div>
+
+        <div class="sidebar-item">
+            <?php
+            // Configuración (mostrar si tiene alguna conf_* permiso)
+            $allowConf = ($perms['conf_usuario'] ?? 0) || ($perms['conf_roles'] ?? 0) || ($perms['conf_empresa'] ?? 0) || ($perms['conf_moneda'] ?? 0) || ($perms['conf_condicion'] ?? 0);
+            if ($allowConf) {
+                echo '<a href="'.$baseUrl.'CxP.php" class="sidebar-link '.($isCxC ? 'active':'').'"><i class="fa-solid fa-sliders"></i><span>Cuentas por Pagar</span></a>';
             } else {
                 echo '<a href="#" class="sidebar-link" style="opacity:0.45;pointer-events:none;cursor:not-allowed;" title="Acceso denegado"><i class="fa-solid fa-sliders"></i><span>Cuentas Por Cobrar</span></a>';
             }

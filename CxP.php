@@ -17,9 +17,9 @@ include 'includes/sidebar.php';
             <div class="row align-items-center">
                 <div class="col">
                     <h4 class="page-title">
-                        <i class="fa-solid fa-file-invoice-dollar me-2"></i>Cuentas por Cobrar (CxC)
+                        <i class="fa-solid fa-file-invoice-dollar me-2"></i>Cuentas por Pagar (CxP)
                     </h4>
-                    <p class="page-subtitle">Administración de clientes, cobros y reportes financieros</p>
+                    <p class="page-subtitle">Administración de proveedores, pagos y reportes financieros</p>
                 </div>
 
                 <div class="user-info">
@@ -39,9 +39,9 @@ include 'includes/sidebar.php';
 
             <!-- MANTENIMIENTOS -->
             <div class="col-md-3">
-                <a href="MantCliente.php" class="card-dashboard">
+                <a href="MantProveedor.php" class="card-dashboard">
                     <i class="fa-solid fa-user-group"></i>
-                    <h5>Clientes</h5>
+                    <h5>Proveedores</h5>
                     <p>Administración de clientes registrados</p>
                 </a>
             </div>
