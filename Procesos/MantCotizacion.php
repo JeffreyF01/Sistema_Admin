@@ -31,11 +31,15 @@ include '../includes/sidebar.php';
 
     <div class="content-area">
         <div class="container-fluid">
-            <div class="mb-3">
-                <button id="btnNuevaCot" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#cotModal">
-                    <i class="fa-solid fa-plus me-2"></i>Nueva Cotización
-                </button>
-                <a href="Cotizacion_listar.php" class="btn btn-secondary"><i class="fa-solid fa-list me-2"></i>Ver Cotizaciones</a>
+            <div class="row mb-3">
+                <div class="col-12 d-flex justify-content-end gap-2">
+                    <button id="btnNuevaCot" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#cotModal">
+                        <i class="fa-solid fa-plus me-2"></i>Nueva Cotización
+                    </button>
+                    <a href="Cotizacion_listar.php" class="btn btn-secondary">
+                        <i class="fa-solid fa-list me-2"></i>Ver Cotizaciones
+                    </a>
+                </div>
             </div>
 
             <div class="card card-custom fade-in">
