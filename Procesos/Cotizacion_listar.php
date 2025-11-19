@@ -1,5 +1,4 @@
 <?php
-// Cotizacion_listar.php
 session_start();
 if(!isset($_SESSION['usuario'])){ header("Location: ../index.html"); exit(); }
 require_once '../conexion.php';

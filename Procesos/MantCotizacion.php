@@ -1,5 +1,4 @@
 <?php
-// Cotizacion_mantenimiento.php
 session_start();
 if(!isset($_SESSION['usuario'])) {
     header("Location: ../index.html");
@@ -66,7 +65,6 @@ include '../includes/sidebar.php';
     </div>
 </div>
 
-<!-- Modal Cotización -->
 <div class="modal fade" id="cotModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-xl">
         <div class="modal-content">
@@ -322,7 +320,6 @@ $(function(){
         }, 'json');
     }
 
-    // actualizar subtotal cuando cambian producto/cantidad
     $('#producto_id').on('change', function(){
         const opt = $(this).find('option:selected');
         const precio = parseFloat(opt.data('precio')) || 0;
@@ -337,9 +334,7 @@ $(function(){
         $('#subtotalItem').val('$' + sub.toFixed(2));
     }
 
-    // agregar item
     $('#btnAddItem').click(function(){
-        // bloqueo si modal en modo editar y cotización facturada
         if($('#id_cotizacion').val() && $('#accion').val() === 'editar' && $('#badgeEstado').text().toLowerCase().includes('fact')) {
             Swal.fire('Bloqueado','No se puede agregar items a una cotización facturada','warning');
             return;
@@ -367,7 +362,6 @@ $(function(){
             });
         }
 
-        // limpiar campos
         $('#producto_id').val('');
         $('#cantidad').val('1');
         $('#precio_unitario').val('');
@@ -384,7 +378,6 @@ $(function(){
             const sub = Number(it.subtotal) || (cant * pu);
             total += sub;
 
-            // asegurar formato numérico correcto
             it.cantidad = cant;
             it.precio_unitario = pu;
             it.subtotal = sub;
@@ -401,7 +394,6 @@ $(function(){
         $('#totalCot').text('$' + total.toFixed(2));
     }
 
-    // eliminar item (con bloqueo si necesario)
     window.removeItem = function(i){
         if($('#id_cotizacion').val() && $('#badgeEstado').text().toLowerCase().includes('fact')) {
             Swal.fire('Bloqueado','No se puede eliminar items de una cotización facturada','warning');
@@ -411,13 +403,11 @@ $(function(){
         actualizarDetalle();
     };
 
-    // guardar cotizacion (envía detalle como array de objetos)
     $('#btnSaveCot').click(function(){
         if(detalle.length === 0){ Swal.fire('Error','Agregue al menos un item','error'); return; }
         if(!$('#cliente_id').val()){ Swal.fire('Error','Seleccione cliente','error'); return; }
         if(!$('#fecha').val()){ Swal.fire('Error','Seleccione fecha','error'); return; }
 
-        // Normalizar detalle: asegurar tipos correctos para el backend
         const detallePayload = detalle.map(i => ({
             producto_id: i.producto_id,
             nombre: i.nombre,
@@ -452,7 +442,6 @@ $(function(){
         });
     });
 
-    // Helper para bloquear/desbloquear modal (inputs, selects y botones dentro del modal)
     function setEditable(flag){
         $('#cotModal').find('input, select, button#btnAddItem').prop('disabled', !flag);
         if(flag){
@@ -462,7 +451,6 @@ $(function(){
         }
     }
 
-    // pequeño helper para evitar inyección en tabla (mostrar texto seguro)
     function escapeHtml(text) {
         if (typeof text !== 'string') return text;
         return text.replace(/[&<>"'\/]/g, function (s) {

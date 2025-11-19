@@ -14,7 +14,7 @@ $mantenimientoPages = [
     'MantDepartamento.php','MantGrupo.php','MantTiposMov.php'
 ];
 $procesoPages = [
-    'MantFacturacion.php','Factura_listar.php'
+    'MantFacturacion.php'
 ];
 $consultaPages = [
     'Consulta_departamento.php',
@@ -80,7 +80,6 @@ function nav_link($url, $icon, $label, $allowed, $isActive = false) {
                 echo nav_link($baseUrl.'MantUbicacion.php', 'fa-solid fa-location-dot', 'Ubicaciones', ($perms['inv_ubicaciones'] ?? 0), $current === 'MantUbicacion.php');
                 echo nav_link($baseUrl.'MantDepartamento.php', 'fa-solid fa-building', 'Departamentos', ($perms['inv_departamentos'] ?? 0), $current === 'MantDepartamento.php');
                 echo nav_link($baseUrl.'MantGrupo.php', 'fa-solid fa-people-group', 'Grupos', ($perms['inv_grupos'] ?? 0), $current === 'MantGrupo.php');
-                // Tipos de movimiento: dependiente de inv_movimientos o inv_cotizaciones (elige lógica que prefieras)
                 $allowTipos = ($perms['inv_movimientos'] ?? 0) || ($perms['inv_cotizaciones'] ?? 0);
                 echo nav_link($baseUrl.'MantTiposMov.php', 'fa-solid fa-arrows-rotate', 'Tipos de movimiento', $allowTipos, $current === 'MantTiposMov.php');
                 ?>

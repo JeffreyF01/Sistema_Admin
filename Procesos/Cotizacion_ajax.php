@@ -1,12 +1,8 @@
 <?php
-// Cotizacion_ajax.php (versión corregida)
-// Lectura: acepta tanto JSON en body como POST form (jQuery $.post)
-
 header('Content-Type: application/json; charset=utf-8');
 session_start();
 require_once '../conexion.php';
 
-// lectura del body raw (soporta JSON)
 $raw = file_get_contents('php://input');
 $data = [];
 if ($raw) {
@@ -14,16 +10,13 @@ if ($raw) {
     if (is_array($decoded)) $data = $decoded;
 }
 
-// también soporta post form simple
 $accion = $data['accion'] ?? $_POST['accion'] ?? '';
 
-// helper para respuesta JSON
 function json_resp($ok, $payload = []) {
     echo json_encode(array_merge(['success' => $ok], $payload));
     exit;
 }
 
-// helper para obtener parámetros (desde JSON body o POST)
 function get_param($key, $default = null) {
     global $data, $_POST;
     if (isset($data[$key])) return $data[$key];
@@ -31,7 +24,6 @@ function get_param($key, $default = null) {
     return $default;
 }
 
-// --------------------- LISTAR cotizaciones (recientes) ---------------------
 if ($accion === 'listar') {
     $sql = "SELECT c.id_cotizaciones, c.numero_documento, c.cliente_id, cli.nombre AS cliente_nombre,
                    DATE_FORMAT(c.fecha, '%Y-%m-%d') as fecha,
@@ -49,7 +41,6 @@ if ($accion === 'listar') {
     json_resp(true, ['data' => $out]);
 }
 
-// --------------------- LISTAR CLIENTES ---------------------
 if ($accion === 'listar_clientes') {
     $sql = "SELECT id_clientes, nombre FROM cliente WHERE activo = 1 ORDER BY nombre";
     $res = $conexion->query($sql);
@@ -58,9 +49,7 @@ if ($accion === 'listar_clientes') {
     json_resp(true, ['data' => $out]);
 }
 
-// --------------------- LISTAR PRODUCTOS (para selección) ---------------------
 if ($accion === 'listar_productos') {
-    // ajusta campos si tu tabla tiene nombres distintos
     $sql = "SELECT id_productos, nombre, precio_venta FROM producto WHERE activo = 1 ORDER BY nombre";
     $res = $conexion->query($sql);
     $out = [];
@@ -68,7 +57,6 @@ if ($accion === 'listar_productos') {
     json_resp(true, ['data' => $out]);
 }
 
-// --------------------- GENERAR NÚMERO ---------------------
 if ($accion === 'generar_numero') {
     $sql = "SELECT MAX(id_cotizaciones) as maxid FROM cotizacion";
     $res = $conexion->query($sql);
@@ -78,7 +66,6 @@ if ($accion === 'generar_numero') {
     json_resp(true, ['numero' => $numero]);
 }
 
-// --------------------- OBTENER una cotizacion y su detalle ---------------------
 $id_param = get_param('id', null);
 if ($accion === 'obtener' && $id_param !== null) {
     $id = (int)$id_param;
@@ -92,7 +79,6 @@ if ($accion === 'obtener' && $id_param !== null) {
 
     $cot = $res->fetch_assoc();
 
-    // detalle
     $det = [];
     $stmt2 = $conexion->prepare("SELECT cd.*, p.nombre 
                                  FROM cotizacion_detalle cd 
@@ -109,18 +95,14 @@ if ($accion === 'obtener' && $id_param !== null) {
     ]);
 }
 
-// --------------------- GUARDAR (guardar o editar) ---------------------
 if (in_array($accion, ['guardar', 'editar'])) {
-    // mezcla: JSON + POST + FormData
     $payload = array_merge($_POST, $data);
 
-    // validar mínimos
     $numero = $payload['numero_documento'] ?? '';
     $fecha = $payload['fecha'] ?? '';
     $valida = $payload['valida_hasta'] ?? '';
     $cliente_id = (int)($payload['cliente_id'] ?? 0);
 
-    // detalle puede llegar como JSON string desde FormData
     if (isset($payload['detalle']) && is_string($payload['detalle'])) {
         $decoded = json_decode($payload['detalle'], true);
         if (is_array($decoded)) $payload['detalle'] = $decoded;
@@ -132,21 +114,18 @@ if (in_array($accion, ['guardar', 'editar'])) {
         json_resp(false, ['message' => 'Datos incompletos']);
     }
 
-    // calcular total
     $total = 0;
     foreach ($detalle as $it) {
         $total += floatval($it['subtotal'] ?? ($it['cantidad'] * $it['precio_unitario']));
     }
 
     if ($accion === 'guardar') {
-        // insertar cotizacion
         $stmt = $conexion->prepare("INSERT INTO cotizacion (numero_documento, cliente_id, usuario_id, fecha, valida_hasta, total, activo) VALUES (?, ?, ?, ?, ?, ?, 1)");
         $usuario_id = $_SESSION['user_info']['id_usuarios'] ?? null;
         $stmt->bind_param("siissd", $numero, $cliente_id, $usuario_id, $fecha, $valida, $total);
         if (!$stmt->execute()) json_resp(false, ['message' => 'Error al insertar cotización: ' . $conexion->error]);
         $cot_id = $conexion->insert_id;
 
-        // insertar detalles
         $stmtDet = $conexion->prepare("INSERT INTO cotizacion_detalle (cotizacion_id, producto_id, cantidad, precio_unitario, activo) VALUES (?, ?, ?, ?, 1)");
         foreach ($detalle as $it) {
             $pid = (int)$it['producto_id'];
@@ -158,11 +137,9 @@ if (in_array($accion, ['guardar', 'editar'])) {
 
         json_resp(true, ['message' => 'Cotización guardada', 'id' => $cot_id]);
     } else {
-        // editar: validar ID
         $id = (int)($payload['id'] ?? 0);
         if ($id <= 0) json_resp(false, ['message' => 'ID inválido']);
 
-        // verificar que la cotizacion no esté convertida (activo=0)
         $r = $conexion->query("SELECT activo FROM cotizacion WHERE id_cotizaciones = " . intval($id) . " LIMIT 1");
         if ($r && $row = $r->fetch_assoc()) {
             if ((int)$row['activo'] === 0) {
@@ -174,7 +151,6 @@ if (in_array($accion, ['guardar', 'editar'])) {
         $stmt->bind_param("sissdi", $numero, $cliente_id, $fecha, $valida, $total, $id);
         if (!$stmt->execute()) json_resp(false, ['message' => 'Error al actualizar cotización: ' . $conexion->error]);
 
-        // eliminar detalle antiguo y reinsertar
         $conexion->query("DELETE FROM cotizacion_detalle WHERE cotizacion_id = " . intval($id));
         $stmtDet = $conexion->prepare("INSERT INTO cotizacion_detalle (cotizacion_id, producto_id, cantidad, precio_unitario, activo) VALUES (?, ?, ?, ?, 1)");
         foreach ($detalle as $it) {
@@ -188,7 +164,6 @@ if (in_array($accion, ['guardar', 'editar'])) {
     }
 }
 
-// --------------------- ANULAR ---------------------
 $id_param = get_param('id', null);
 if ($accion === 'anular' && $id_param !== null) {
     $id = (int)$id_param;
@@ -198,15 +173,12 @@ if ($accion === 'anular' && $id_param !== null) {
     else json_resp(false, ['message' => 'Error al anular: ' . $conexion->error]);
 }
 
-// --------------------- CONVERTIR A FACTURA ---------------------
 if ($accion === 'convertir_a_factura' && $id_param !== null) {
     $id = (int)$id_param;
-    // obtener cotizacion
     $r = $conexion->query("SELECT * FROM cotizacion WHERE id_cotizaciones = " . intval($id) . " LIMIT 1");
     if ($r->num_rows === 0) json_resp(false, ['message' => 'Cotización no encontrada']);
     $cot = $r->fetch_assoc();
 
-    // si ya está inactiva -> ya convertida / anulada
     if ((int)$cot['activo'] === 0) {
         json_resp(false, ['message' => 'La cotización ya fue convertida / está bloqueada.']);
     }
@@ -215,16 +187,13 @@ if ($accion === 'convertir_a_factura' && $id_param !== null) {
     $det = [];
     while ($d = $detRes->fetch_assoc()) $det[] = $d;
 
-    // intentar insertar en facturas
     $conexion->begin_transaction();
     try {
-        // obtener una condicion de pago válida (evitar NULL)
         $condRes = $conexion->query("SELECT id_condiciones_pago FROM condicion_pago WHERE activo = 1 LIMIT 1");
         if ($condRes && $condRes->num_rows > 0) {
             $condRow = $condRes->fetch_assoc();
             $condicion_id = (int)$condRow['id_condiciones_pago'];
         } else {
-            // fallback: usa 1 (ajusta si tu sistema no tiene id=1)
             $condicion_id = 1;
         }
 
@@ -246,7 +215,6 @@ if ($accion === 'convertir_a_factura' && $id_param !== null) {
             if (!$stmtDet->execute()) throw new Exception('Error insert factura_detalle: ' . $conexion->error);
         }
 
-        // MARCAR COTIZACIÓN COMO CONVERTIDA (inactiva)
         $q = $conexion->prepare("UPDATE cotizacion SET activo = 0 WHERE id_cotizaciones = ? LIMIT 1");
         $q->bind_param("i", $id);
         if (!$q->execute()) throw new Exception('Error marcando cotización como convertida: ' . $conexion->error);
@@ -259,5 +227,4 @@ if ($accion === 'convertir_a_factura' && $id_param !== null) {
     }
 }
 
-// Si llega aquí, acción no soportada
 json_resp(false, ['message' => 'Acción inválida']);
