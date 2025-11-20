@@ -40,6 +40,7 @@ $isProceso = in_array($current, $procesoPages, true);
 $isConsulta = in_array($current, $consultaPages, true);
 $isConfiguracion = ($current === 'Configuracion.php');
 $isCxC = ($current === 'CxC.php');
+$isCxP = ($current === 'CxP.php');
 
 // permisos desde la sesión
 $perms = $_SESSION['permisos'] ?? [];
@@ -169,9 +170,9 @@ function nav_link($url, $icon, $label, $allowed, $isActive = false) {
             // Configuración (mostrar si tiene alguna conf_* permiso)
             $allowConf = ($perms['conf_usuario'] ?? 0) || ($perms['conf_roles'] ?? 0) || ($perms['conf_empresa'] ?? 0) || ($perms['conf_moneda'] ?? 0) || ($perms['conf_condicion'] ?? 0);
             if ($allowConf) {
-                echo '<a href="'.$baseUrl.'CxC.php" class="sidebar-link '.($isCxC ? 'active':'').'"><i class="fa-solid fa-sliders"></i><span>Cuentas por Cobrar</span></a>';
+                echo '<a href="'.$baseUrl.'CxC.php" class="sidebar-link '.($isCxC ? 'active':'').'"><i class="fa-solid fa-hand-holding-dollar"></i><span>Cuentas por Cobrar</span></a>';
             } else {
-                echo '<a href="#" class="sidebar-link" style="opacity:0.45;pointer-events:none;cursor:not-allowed;" title="Acceso denegado"><i class="fa-solid fa-sliders"></i><span>Cuentas Por Cobrar</span></a>';
+                echo '<a href="#" class="sidebar-link" style="opacity:0.45;pointer-events:none;cursor:not-allowed;" title="Acceso denegado"><i class="fa-solid fa-hand-holding-dollar"></i><span>Cuentas por Cobrar</span></a>';
             }
             ?>
         </div>
@@ -181,9 +182,9 @@ function nav_link($url, $icon, $label, $allowed, $isActive = false) {
             // Configuración (mostrar si tiene alguna conf_* permiso)
             $allowConf = ($perms['conf_usuario'] ?? 0) || ($perms['conf_roles'] ?? 0) || ($perms['conf_empresa'] ?? 0) || ($perms['conf_moneda'] ?? 0) || ($perms['conf_condicion'] ?? 0);
             if ($allowConf) {
-                echo '<a href="'.$baseUrl.'CxP.php" class="sidebar-link '.($isCxC ? 'active':'').'"><i class="fa-solid fa-sliders"></i><span>Cuentas por Pagar</span></a>';
+                echo '<a href="'.$baseUrl.'CxP.php" class="sidebar-link '.($isCxP ? 'active':'').'"><i class="fa-solid fa-money-check-dollar"></i><span>Cuentas por Pagar</span></a>';
             } else {
-                echo '<a href="#" class="sidebar-link" style="opacity:0.45;pointer-events:none;cursor:not-allowed;" title="Acceso denegado"><i class="fa-solid fa-sliders"></i><span>Cuentas Por Cobrar</span></a>';
+                echo '<a href="#" class="sidebar-link" style="opacity:0.45;pointer-events:none;cursor:not-allowed;" title="Acceso denegado"><i class="fa-solid fa-money-check-dollar"></i><span>Cuentas por Pagar</span></a>';
             }
             ?>
         </div>
