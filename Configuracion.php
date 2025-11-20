@@ -43,14 +43,6 @@ include 'includes/sidebar.php';
             </div>
 
             <div class="col-md-3">
-                <a href="#" class="card-dashboard">
-                    <i class="fa-solid fa-window-restore"></i>
-                    <h5>Usuario vs Ventana</h5>
-                    <p>Asignación de permisos</p>
-                </a>
-            </div>
-
-            <div class="col-md-3">
                 <a href="MantEmpresa.php" class="card-dashboard">
                     <i class="fa-solid fa-building"></i>
                     <h5>Empresa</h5>

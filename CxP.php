@@ -21,15 +21,15 @@ include 'includes/sidebar.php';
                     </h4>
                     <p class="page-subtitle">Administración de proveedores, pagos y reportes financieros</p>
                 </div>
-
-                <div class="user-info">
-                    <div class="user-avatar"><?php echo strtoupper(substr($usuario, 0, 1)); ?></div>
+                <div class="col-auto d-flex align-items-center gap-3">
+                    <div class="user-info">
+                        <div class="user-avatar"><?php echo strtoupper(substr($usuario, 0, 1)); ?></div>
                         <div class="user-details">
-                <div class="username"><?php echo $usuario; ?></div>
-            <div class="role">Usuario del Sistema</div>
-        </div>
-</div>
-
+                            <div class="username"><?php echo $usuario; ?></div>
+                            <div class="role">Administrador</div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

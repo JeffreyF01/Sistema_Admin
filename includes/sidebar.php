@@ -24,7 +24,14 @@ $consultaPages = [
     'Consulta_grupo.php',
     'Consulta_tiposmov.php',
     'Consulta_producto.php',
-    'Consulta_factura.php'
+    'Consulta_factura.php',
+    'Consulta_usuario.php',
+    'Consulta_empresa.php',
+    'Consulta_rol.php',
+    'Consulta_moneda.php',
+    'Consulta_condicionpago.php',
+    'Consulta_cliente.php',
+    'Consulta_proveedor.php'
 ];
 
 $isDashboard = ($current === 'dashboard.php');
@@ -122,6 +129,13 @@ function nav_link($url, $icon, $label, $allowed, $isActive = false) {
                 echo nav_link($baseUrl.'Consultas/Consulta_tiposmov.php', 'fa-solid fa-arrows-rotate', 'Tipos de Movimiento', $allowConsultas, $current === 'Consulta_tiposmov.php');
                 echo nav_link($baseUrl.'Consultas/Consulta_producto.php', 'fa-solid fa-box', 'Productos', $allowConsultas, $current === 'Consulta_producto.php');
                 echo nav_link($baseUrl.'Consultas/Consulta_factura.php', 'fa-solid fa-file-invoice-dollar', 'Facturas', $allowConsultas, $current === 'Consulta_factura.php');
+                echo nav_link($baseUrl.'Consultas/Consulta_usuario.php', 'fa-solid fa-user', 'Usuarios', $allowConsultas, $current === 'Consulta_usuario.php');
+                echo nav_link($baseUrl.'Consultas/Consulta_empresa.php', 'fa-solid fa-building', 'Empresas', $allowConsultas, $current === 'Consulta_empresa.php');
+                echo nav_link($baseUrl.'Consultas/Consulta_moneda.php', 'fa-solid fa-coins', 'Monedas', $allowConsultas, $current === 'Consulta_moneda.php');
+                echo nav_link($baseUrl.'Consultas/Consulta_rol.php', 'fa-solid fa-id-badge', 'Roles', $allowConsultas, $current === 'Consulta_rol.php');
+                echo nav_link($baseUrl.'Consultas/Consulta_condicionpago.php', 'fa-solid fa-hand-holding-dollar', 'Condiciones Pago', $allowConsultas, $current === 'Consulta_condicionpago.php');
+                echo nav_link($baseUrl.'Consultas/Consulta_cliente.php', 'fa-solid fa-user-group', 'Clientes', $allowConsultas, $current === 'Consulta_cliente.php');
+                echo nav_link($baseUrl.'Consultas/Consulta_proveedor.php', 'fa-solid fa-truck', 'Proveedores', $allowConsultas, $current === 'Consulta_proveedor.php');
                 ?>
             </div>
         </div>
