@@ -108,6 +108,8 @@ function nav_link($url, $icon, $label, $allowed, $isActive = false) {
                 // Facturación -> permiso inv_facturacion
                 echo nav_link($baseUrl.'Procesos/MantFacturacion.php', 'fa-solid fa-file-invoice-dollar', 'Facturación', ($perms['inv_facturacion'] ?? 0), $current === 'MantFacturacion.php');
                 echo nav_link($baseUrl.'Procesos/MantCotizacion.php', 'fa-solid fa-file-invoice-dollar', 'Cotización', ($perms['inv_cotizaciones'] ?? 0), $current === 'MantCotizacion.php');
+                echo nav_link($baseUrl.'Procesos/MantCompra.php', 'fa-solid fa-file-invoice-dollar', 'Compra', ($perms['inv_compras'] ?? 0), $current === 'MantCompra.php');
+                echo nav_link($baseUrl.'Procesos/MantPago.php', 'fa-solid fa-file-invoice-dollar', 'Pago', ($perms['exp_pagos'] ?? 0), $current === 'MantPago.php');
                 ?>
             </div>
         </div>
