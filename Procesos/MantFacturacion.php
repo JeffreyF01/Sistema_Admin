@@ -7,6 +7,8 @@ if(!isset($_SESSION['usuario'])) {
 require_once '../conexion.php';
 include '../includes/header.php';
 include '../includes/sidebar.php';
+// Obtener cotización origen si se pasó como parámetro
+$cotizacion_id = isset($_GET['cotizacion_id']) ? intval($_GET['cotizacion_id']) : 0;
 ?>
 <div class="main-content">
     <div class="main-header">
@@ -87,6 +89,7 @@ include '../includes/sidebar.php';
                 <form id="facturaForm">
                     <input type="hidden" id="facturaId" name="id">
                     <input type="hidden" id="accion" name="accion" value="guardar">
+                    <input type="hidden" id="cotizacionOrigenId" name="cotizacion_id" value="">
 
                     <!-- Información de la Factura -->
                     <div class="row g-3 mb-4">
@@ -235,6 +238,8 @@ include '../includes/sidebar.php';
 $(document).ready(function() {
     let detalleItems = [];
     let productosList = [];
+    const cotizacionOrigen = <?php echo $cotizacion_id; ?>;
+    let cotizacionCargada = false;
 
     // Cargar facturas
     cargarFacturas();
@@ -256,6 +261,9 @@ $(document).ready(function() {
         }
         // Asegurar que los productos y su stock estén actualizados al abrir
         cargarProductos();
+        if(cotizacionOrigen>0){
+            $('#cotizacionOrigenId').val(cotizacionOrigen);
+        }
     });
 
     // Limpiar modal al cerrar
@@ -266,6 +274,9 @@ $(document).ready(function() {
         detalleItems = [];
         actualizarTablaDetalle();
         $('#facturaModalLabel').html('<i class="fa-solid fa-file-invoice-dollar me-2"></i>Nueva Factura');
+        // Rehabilitar selección de cliente al salir de flujo de cotización
+        $('#clienteId').prop('disabled', false).removeClass('bg-light');
+        $('#clienteId').attr('title','');
     });
 
     // Calcular subtotal al cambiar cantidad o producto
@@ -351,7 +362,8 @@ $(document).ready(function() {
             cliente_id: $('#clienteId').val(),
             fecha: $('#fecha').val(),
             condicion_id: $('#condicionId').val(),
-            detalle: detalleItems
+            detalle: detalleItems,
+            cotizacion_id: $('#cotizacionOrigenId').val() || null
         };
 
         $.ajax({
@@ -487,6 +499,11 @@ $(document).ready(function() {
                         $('#precio').val(parseFloat(precio).toFixed(2));
                         calcularSubtotalItem();
                     });
+
+                    // Si se vino desde una cotización, cargarla una vez que productos estén listos
+                    if (cotizacionOrigen > 0 && !cotizacionCargada) {
+                        cargarCotizacion(cotizacionOrigen);
+                    }
                 }
             }
         });
@@ -678,6 +695,57 @@ $(document).ready(function() {
             }
         });
     };
+
+    function cargarCotizacion(id) {
+        $.ajax({
+            url: 'Factura_ajax.php',
+            type: 'POST',
+            data: { accion: 'cargar_desde_cotizacion', id: id },
+            success: function(response) {
+                if (!response.success) {
+                    Swal.fire('Error', response.message || 'No se pudo cargar la cotización', 'error');
+                    return;
+                }
+                const cot = response.data.cotizacion;
+                const det = response.data.detalle || [];
+                // Asignar cliente y fecha (usar fecha actual para factura)
+                $('#clienteId').val(cot.cliente_id);
+                // Bloquear cambio de cliente si viene de cotización
+                $('#clienteId').prop('disabled', true).addClass('bg-light');
+                $('#clienteId').attr('title','Cliente definido por la cotización');
+                $('#fecha').val(new Date().toISOString().split('T')[0]);
+                // Marcar etiqueta del modal
+                $('#facturaModalLabel').html(`<i class="fa-solid fa-file-invoice-dollar me-2"></i>Factura desde ${cot.numero_documento}`);
+
+                // Mapear detalle respetando stock actual
+                detalleItems = det.map(function(item){
+                    const productoActual = productosList.find(p => parseInt(p.id_productos) === parseInt(item.producto_id));
+                    let stockDisp = productoActual ? parseFloat(productoActual.stock) : parseFloat(item.stock);
+                    let cantidad = parseFloat(item.cantidad);
+                    if (cantidad > stockDisp) {
+                        cantidad = stockDisp; // ajustar para no exceder stock
+                    }
+                    const precio = parseFloat(item.precio_unitario);
+                    return {
+                        producto_id: item.producto_id,
+                        nombre: item.nombre,
+                        cantidad: cantidad,
+                        precio_unitario: precio,
+                        subtotal: cantidad * precio
+                    };
+                });
+                actualizarTablaDetalle();
+                cotizacionCargada = true;
+                // Abrir modal de factura automáticamente
+                const modal = new bootstrap.Modal(document.getElementById('facturaModal'));
+                modal.show();
+                Swal.fire('Cotización cargada', 'Puede agregar o quitar productos antes de guardar la factura.', 'info');
+            },
+            error: function(){
+                Swal.fire('Error','Error al cargar la cotización','error');
+            }
+        });
+    }
 });
 </script>
 <?php include '../includes/footer.php'; ?>

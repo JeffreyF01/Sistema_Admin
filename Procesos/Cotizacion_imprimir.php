@@ -1,0 +1,134 @@
+<?php
+session_start();
+if(!isset($_SESSION['usuario'])) {
+    header("Location: ../index.html");
+    exit();
+}
+require_once '../conexion.php';
+
+$cot_id = isset($_GET['id']) ? intval($_GET['id']) : 0;
+if ($cot_id <= 0) { die('ID de cotización no válido'); }
+
+// Cabecera cotización
+$stmt = $conexion->prepare("SELECT c.*, cli.nombre AS cliente_nombre, cli.doc_identidad, cli.direccion, cli.telefono, cli.email
+                            FROM cotizacion c
+                            LEFT JOIN cliente cli ON cli.id_clientes = c.cliente_id
+                            WHERE c.id_cotizaciones = ? LIMIT 1");
+$stmt->bind_param("i", $cot_id);
+$stmt->execute();
+$res = $stmt->get_result();
+if($res->num_rows === 0){ die('Cotización no encontrada'); }
+$cot = $res->fetch_assoc();
+
+// Detalle
+$stmtDet = $conexion->prepare("SELECT cd.*, p.nombre AS producto_nombre, p.sku, p.precio_venta
+                               FROM cotizacion_detalle cd
+                               LEFT JOIN producto p ON p.id_productos = cd.producto_id
+                               WHERE cd.cotizacion_id = ? ORDER BY cd.id_cotizacion_detalle");
+$stmtDet->bind_param("i", $cot_id);
+$stmtDet->execute();
+$detRes = $stmtDet->get_result();
+
+// Empresa
+$empresa = null;
+$empRes = $conexion->query("SELECT * FROM empresa LIMIT 1");
+if($empRes && $empRes->num_rows > 0){ $empresa = $empRes->fetch_assoc(); }
+
+?>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cotización <?php echo htmlspecialchars($cot['numero_documento']); ?></title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        @media print { .no-print { display:none !important; } body{ margin:0; padding:0;} @page{ margin:1cm; } }
+        body { font-family:'Segoe UI', Tahoma, sans-serif; background:#f5f5f5; padding:20px; }
+        .doc-container { max-width:900px; margin:auto; background:#fff; padding:40px; box-shadow:0 0 10px rgba(0,0,0,.1); position:relative; }
+        .header-border { border-bottom:3px solid #0d6efd; padding-bottom:20px; margin-bottom:30px; }
+        .company h2 { color:#0d6efd; font-weight:700; margin-bottom:5px; }
+        .status-badge { display:inline-block; padding:6px 14px; border-radius:18px; font-size:13px; font-weight:500; }
+        .status-activa { background:#d1e7dd; color:#0f5132; }
+        .status-inactiva { background:#e2e3e5; color:#41464b; }
+        .watermark { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%) rotate(-35deg); font-size:120px; color:rgba(108,117,125,.15); font-weight:700; pointer-events:none; }
+        table thead th { background:#0d6efd; color:#fff; }
+        .total-row td { background:#0d6efd; color:#fff; font-weight:700; }
+        .footer-note { margin-top:30px; text-align:center; color:#6c757d; font-size:.9em; border-top:2px solid #dee2e6; padding-top:15px; }
+        .btn-print { position:fixed; bottom:30px; right:30px; box-shadow:0 4px 6px rgba(0,0,0,.2); }
+    </style>
+</head>
+<body>
+<div class="doc-container">
+    <?php if((int)$cot['activo'] === 0): ?><div class="watermark">FACTURADA</div><?php endif; ?>
+    <div class="header-border">
+        <div class="company text-center mb-3">
+            <?php if($empresa): ?>
+                <h2><?php echo htmlspecialchars($empresa['nombre']); ?></h2>
+                <?php if($empresa['rnc']): ?><p class="mb-1"><strong>RNC:</strong> <?php echo htmlspecialchars($empresa['rnc']); ?></p><?php endif; ?>
+                <?php if($empresa['direccion']): ?><p class="mb-1"><?php echo htmlspecialchars($empresa['direccion']); ?></p><?php endif; ?>
+                <?php if($empresa['telefono']): ?><p class="mb-1"><strong>Tel:</strong> <?php echo htmlspecialchars($empresa['telefono']); ?></p><?php endif; ?>
+                <?php if($empresa['email']): ?><p class="mb-0"><strong>Email:</strong> <?php echo htmlspecialchars($empresa['email']); ?></p><?php endif; ?>
+            <?php else: ?>
+                <h2>SISTEMA ADMIN</h2>
+                <p class="mb-0">Cotización comercial</p>
+            <?php endif; ?>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <h4 class="mb-2">COTIZACIÓN</h4>
+                <p class="mb-1"><strong>N°:</strong> <?php echo htmlspecialchars($cot['numero_documento']); ?></p>
+                <p class="mb-1"><strong>Fecha:</strong> <?php echo date('d/m/Y', strtotime($cot['fecha'])); ?></p>
+                <p class="mb-1"><strong>Válida Hasta:</strong> <?php echo date('d/m/Y', strtotime($cot['valida_hasta'])); ?></p>
+                <p class="mb-0"><strong>Estado:</strong> <span class="status-badge <?php echo (int)$cot['activo']===1?'status-activa':'status-inactiva'; ?>"><?php echo (int)$cot['activo']===1?'ACTIVA':'FACTURADA'; ?></span></p>
+            </div>
+            <div class="col-md-6 text-end">
+                <h5 class="mb-2">CLIENTE</h5>
+                <p class="mb-1"><strong><?php echo htmlspecialchars($cot['cliente_nombre'] ?? ''); ?></strong></p>
+                <?php if($cot['doc_identidad']): ?><p class="mb-1"><strong>Doc:</strong> <?php echo htmlspecialchars($cot['doc_identidad']); ?></p><?php endif; ?>
+                <?php if($cot['direccion']): ?><p class="mb-1"><?php echo htmlspecialchars($cot['direccion']); ?></p><?php endif; ?>
+                <?php if($cot['telefono']): ?><p class="mb-1"><strong>Tel:</strong> <?php echo htmlspecialchars($cot['telefono']); ?></p><?php endif; ?>
+                <?php if($cot['email']): ?><p class="mb-0"><strong>Email:</strong> <?php echo htmlspecialchars($cot['email']); ?></p><?php endif; ?>
+            </div>
+        </div>
+    </div>
+
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th style="width:15%">SKU</th>
+                <th style="width:45%">Descripción</th>
+                <th style="width:15%" class="text-center">Cantidad</th>
+                <th style="width:10%" class="text-end">Precio</th>
+                <th style="width:15%" class="text-end">Subtotal</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php $total=0; while($it = $detRes->fetch_assoc()): $sub = floatval($it['cantidad']) * floatval($it['precio_unitario']); $total += $sub; ?>
+            <tr>
+                <td><?php echo htmlspecialchars($it['sku']); ?></td>
+                <td><?php echo htmlspecialchars($it['producto_nombre']); ?></td>
+                <td class="text-center">&nbsp;<?php echo number_format($it['cantidad'],2); ?></td>
+                <td class="text-end">$<?php echo number_format($it['precio_unitario'],2); ?></td>
+                <td class="text-end">$<?php echo number_format($sub,2); ?></td>
+            </tr>
+            <?php endwhile; ?>
+        </tbody>
+        <tfoot>
+            <tr class="total-row">
+                <td colspan="4" class="text-end">TOTAL:</td>
+                <td class="text-end">$<?php echo number_format($total,2); ?></td>
+            </tr>
+        </tfoot>
+    </table>
+
+    <div class="footer-note">
+        <p class="mb-1"><strong>Documento generado el <?php echo date('d/m/Y H:i:s'); ?></strong></p>
+        <p class="mb-0">Precios sujetos a cambio sin previo aviso antes de facturar.</p>
+    </div>
+</div>
+<button class="btn btn-primary btn-lg no-print btn-print" onclick="window.print()"><i class="fas fa-print"></i> Imprimir</button>
+<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+<!-- window.onload = function(){ window.print(); }  -->
+</body>
+</html>

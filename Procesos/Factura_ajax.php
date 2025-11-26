@@ -56,6 +56,9 @@ try {
         case 'generar_numero':
             generarNumeroDocumento($conexion);
             break;
+        case 'cargar_desde_cotizacion':
+            cargarDesdeCotizacion($conexion, $data['id'] ?? null);
+            break;
         default:
             echo json_encode(['success' => false, 'message' => 'Acción no válida']);
     }
@@ -72,6 +75,7 @@ function guardarFactura($conexion, $data, $usuario_id) {
         $fecha = $data['fecha'];
         $condicion_id = $data['condicion_id'];
         $detalle = $data['detalle'];
+        $cotizacion_id = isset($data['cotizacion_id']) ? intval($data['cotizacion_id']) : 0;
 
         // Calcular total
         $total = 0;
@@ -132,11 +136,19 @@ function guardarFactura($conexion, $data, $usuario_id) {
                                          $numero_documento, $fecha, $usuario_id, 'SALIDA');
         }
 
+        // Si proviene de cotización editable, marcarla como convertida (inactiva)
+        if ($cotizacion_id > 0) {
+            $stmt_cot = $conexion->prepare("UPDATE cotizacion SET activo = 0 WHERE id_cotizaciones = ? AND activo = 1");
+            $stmt_cot->bind_param("i", $cotizacion_id);
+            $stmt_cot->execute();
+        }
+
         $conexion->commit();
         echo json_encode([
             'success' => true, 
             'message' => 'Factura guardada correctamente',
-            'factura_id' => $factura_id
+            'factura_id' => $factura_id,
+            'cotizacion_convertida' => $cotizacion_id > 0 ? $cotizacion_id : null
         ]);
 
     } catch (Exception $e) {
@@ -329,5 +341,52 @@ function generarNumeroDocumento($conexion) {
     $nuevo_numero = 'FAC-' . str_pad($numero, 8, '0', STR_PAD_LEFT);
     
     echo json_encode(['success' => true, 'numero' => $nuevo_numero]);
+}
+
+function cargarDesdeCotizacion($conexion, $id) {
+    if (!$id) {
+        echo json_encode(['success' => false, 'message' => 'ID cotización requerido']);
+        return;
+    }
+    $id = intval($id);
+
+    $stmt = $conexion->prepare("SELECT c.*, cli.nombre AS cliente_nombre FROM cotizacion c INNER JOIN cliente cli ON cli.id_clientes = c.cliente_id WHERE c.id_cotizaciones = ? LIMIT 1");
+    $stmt->bind_param("i", $id);
+    $stmt->execute();
+    $res = $stmt->get_result();
+    if ($res->num_rows === 0) {
+        echo json_encode(['success' => false, 'message' => 'Cotización no encontrada']);
+        return;
+    }
+    $cot = $res->fetch_assoc();
+    if ((int)$cot['activo'] === 0) {
+        echo json_encode(['success' => false, 'message' => 'Cotización ya convertida o anulada']);
+        return;
+    }
+
+    $stmtDet = $conexion->prepare("SELECT cd.*, p.nombre AS producto_nombre, p.precio_venta, p.stock FROM cotizacion_detalle cd INNER JOIN producto p ON p.id_productos = cd.producto_id WHERE cd.cotizacion_id = ?");
+    $stmtDet->bind_param("i", $id);
+    $stmtDet->execute();
+    $detRes = $stmtDet->get_result();
+    $detalle = [];
+    while ($row = $detRes->fetch_assoc()) {
+        $cantidad = floatval($row['cantidad']);
+        $precioUnit = floatval($row['precio_unitario']);
+        $subtotal = $cantidad * $precioUnit;
+        $detalle[] = [
+            'producto_id' => (int)$row['producto_id'],
+            'nombre' => $row['producto_nombre'],
+            'cantidad' => $cantidad,
+            'precio_unitario' => $precioUnit,
+            'precio_actual' => floatval($row['precio_venta']),
+            'stock' => floatval($row['stock']),
+            'subtotal' => $subtotal
+        ];
+    }
+
+    echo json_encode(['success' => true, 'data' => [
+        'cotizacion' => $cot,
+        'detalle' => $detalle
+    ]]);
 }
 ?>

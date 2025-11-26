@@ -162,6 +162,7 @@ include '../includes/sidebar.php';
             </div>
             <div class="modal-footer">
                 <button id="btnCancelarCot" class="btn btn-secondary" data-bs-dismiss="modal"><i class="fa-solid fa-times me-2"></i>Cancelar</button>
+                <button id="btnFacturarCot" class="btn btn-success"><i class="fa-solid fa-file-invoice-dollar me-2"></i>Facturar</button>
                 <button id="btnSaveCot" class="btn btn-primary"><i class="fa-solid fa-save me-2"></i>Guardar Cotización</button>
             </div>
         </div>
@@ -200,12 +201,19 @@ $(function(){
             if(res.success){
                 res.data.forEach(function(c){
                     let estado = c.activo == 1 ? '<span class="badge bg-success">ACTIVA</span>' : '<span class="badge bg-secondary">FACTURADA</span>';
-                    let acciones = `<button class="btn btn-sm btn-info" onclick="verCot(${c.id_cotizaciones})" title="Ver"><i class="fa-solid fa-eye"></i></button>
-                                    <button class="btn btn-sm btn-primary" onclick="imprimirCot(${c.id_cotizaciones})" title="Imprimir"><i class="fa-solid fa-print"></i></button>`;
-                    if(c.activo == 1){
-                        acciones += ` <button class="btn btn-sm btn-success" onclick="convertirFactura(${c.id_cotizaciones})" title="Convertir a factura"><i class="fa-solid fa-file-invoice-dollar"></i></button>`;
-                        acciones += ` <button class="btn btn-sm btn-danger" onclick="anularCot(${c.id_cotizaciones})" title="Anular"><i class="fa-solid fa-ban"></i></button>`;
-                    }
+                        let acciones = '';
+                        if(c.activo == 1){
+                            acciones = `
+                                <button class=\"btn btn-sm btn-success\" onclick=\"convertirFactura(${c.id_cotizaciones})\" title=\"Facturar directo\"><i class=\"fa-solid fa-file-invoice-dollar\"></i></button>
+                                <button class=\"btn btn-sm btn-warning\" onclick=\"facturarEditable(${c.id_cotizaciones})\" title=\"Facturar editable\"><i class=\"fa-solid fa-pen-to-square\"></i></button>
+                                <button class=\"btn btn-sm btn-primary\" onclick=\"imprimirCot(${c.id_cotizaciones})\" title=\"Imprimir cotización\"><i class=\"fa-solid fa-print\"></i></button>
+                                <button class=\"btn btn-sm btn-danger\" onclick=\"anularCot(${c.id_cotizaciones})\" title=\"Anular\"><i class=\"fa-solid fa-ban\"></i></button>
+                            `;
+                        } else {
+                            acciones = `
+                                <button class=\"btn btn-sm btn-primary\" onclick=\"imprimirCot(${c.id_cotizaciones})\" title=\"Imprimir cotización\"><i class=\"fa-solid fa-print\"></i></button>
+                            `;
+                        }
                     html += `<tr>
                         <td>${c.numero_documento}</td>
                         <td>${c.cliente_nombre}</td>
@@ -257,6 +265,11 @@ $(function(){
         }, 'json');
     };
 
+    // Restaurar función para facturación editable (redirige a pantalla de facturación con pre-carga)
+    window.facturarEditable = function(id){
+        window.location.href = 'MantFacturacion.php?cotizacion_id=' + id;
+    };
+
     window.imprimirCot = function(id){
         window.open('Cotizacion_imprimir.php?id=' + id, '_blank');
     };
@@ -294,6 +307,7 @@ $(function(){
             },'json');
         });
     };
+
 
     function cargarClientes(){
         $.post('Cotizacion_ajax.php',{ accion:'listar_clientes' }, function(res){
@@ -376,6 +390,7 @@ $(function(){
     function actualizarDetalle(){
         let html = '';
         let total = 0;
+        const bloqueada = $('#badgeEstado').text().toLowerCase().includes('fact');
         detalle.forEach((it, idx) => {
             const cant = Number(it.cantidad) || 0;
             const pu = Number(it.precio_unitario) || 0;
@@ -386,17 +401,57 @@ $(function(){
             it.precio_unitario = pu;
             it.subtotal = sub;
 
+            let acciones = '';
+            if(!bloqueada){
+                acciones = `
+                <div class="btn-group btn-group-sm" role="group">
+                    <button type="button" class="btn btn-outline-primary" onclick="decrementarItemCot(${idx})" title="Disminuir"><i class="fa-solid fa-minus"></i></button>
+                    <button type="button" class="btn btn-outline-success" onclick="incrementarItemCot(${idx})" title="Aumentar"><i class="fa-solid fa-plus"></i></button>
+                    <button type="button" class="btn btn-outline-danger" onclick="removeItem(${idx})" title="Eliminar"><i class="fa-solid fa-trash"></i></button>
+                </div>`;
+            } else {
+                acciones = '<span class="text-muted">--</span>';
+            }
             html += `<tr>
                 <td>${escapeHtml(it.nombre)}</td>
                 <td>${cant}</td>
                 <td>$${pu.toFixed(2)}</td>
                 <td>$${sub.toFixed(2)}</td>
-                <td><button class="btn btn-sm btn-danger" onclick="removeItem(${idx})"><i class="fa-solid fa-trash"></i></button></td>
+                <td>${acciones}</td>
             </tr>`;
         });
         $('#detalleCotTable tbody').html(html || '<tr><td colspan="5" class="text-center">No hay items</td></tr>');
         $('#totalCot').text('$' + total.toFixed(2));
     }
+
+    window.incrementarItemCot = function(index){
+        if($('#badgeEstado').text().toLowerCase().includes('fact')) return; // bloqueada
+        const item = detalle[index];
+        if(!item) return;
+        item.cantidad = Number(item.cantidad) + 1;
+        item.subtotal = Number(item.cantidad) * Number(item.precio_unitario);
+        actualizarDetalle();
+    };
+
+    window.decrementarItemCot = function(index){
+        if($('#badgeEstado').text().toLowerCase().includes('fact')) return; // bloqueada
+        const item = detalle[index];
+        if(!item) return;
+        if(Number(item.cantidad) <= 1){
+            Swal.fire({
+                title:'¿Eliminar item?',
+                text:'Cantidad mínima es 1. ¿Desea eliminar este producto?',
+                icon:'question',
+                showCancelButton:true,
+                confirmButtonText:'Eliminar',
+                cancelButtonText:'Cancelar'
+            }).then(r=>{ if(r.isConfirmed){ removeItem(index); } });
+            return;
+        }
+        item.cantidad = Number(item.cantidad) - 1;
+        item.subtotal = Number(item.cantidad) * Number(item.precio_unitario);
+        actualizarDetalle();
+    };
 
     window.removeItem = function(i){
         if($('#id_cotizacion').val() && $('#badgeEstado').text().toLowerCase().includes('fact')) {
@@ -446,12 +501,73 @@ $(function(){
         });
     });
 
+    $('#btnFacturarCot').click(function(){
+        if($('#badgeEstado').text().toLowerCase().includes('fact')) {
+            Swal.fire('Información','La cotización ya está facturada','info');
+            return;
+        }
+        if(detalle.length === 0){ Swal.fire('Error','Agregue al menos un item','error'); return; }
+        if(!$('#cliente_id').val()){ Swal.fire('Error','Seleccione cliente','error'); return; }
+        if(!$('#fecha').val()){ Swal.fire('Error','Seleccione fecha','error'); return; }
+
+        const detallePayload = detalle.map(i => ({
+            producto_id: i.producto_id,
+            nombre: i.nombre,
+            cantidad: Number(i.cantidad) || 0,
+            precio_unitario: Number(i.precio_unitario) || 0,
+            subtotal: Number(i.subtotal) || (Number(i.cantidad) * Number(i.precio_unitario))
+        }));
+
+        const payload = {
+            accion: $('#accion').val(),
+            id: $('#id_cotizacion').val(),
+            numero_documento: $('#numero_documento').val(),
+            fecha: $('#fecha').val(),
+            valida_hasta: $('#valida_hasta').val(),
+            cliente_id: $('#cliente_id').val(),
+            detalle: detallePayload
+        };
+
+        // Guardar primero (si es nueva o edición) y luego convertir
+        $.ajax({
+            url: 'Cotizacion_ajax.php',
+            method: 'POST',
+            data: JSON.stringify(payload),
+            contentType: 'application/json',
+            success: function(res){
+                if(!res.success){ Swal.fire('Error', res.message, 'error'); return; }
+                const cot_id = res.id || $('#id_cotizacion').val();
+                $('#id_cotizacion').val(cot_id);
+                // ahora convertir
+                $.post('Cotizacion_ajax.php', { accion:'convertir_a_factura', id: cot_id }, function(conv){
+                    if(conv.success){
+                        Swal.fire({
+                            icon:'success',
+                            title:'Facturada',
+                            text:'Factura creada ID: '+conv.factura_id,
+                            showCancelButton:true,
+                            confirmButtonText:'Imprimir Factura',
+                            cancelButtonText:'Cerrar'
+                        }).then(r=>{ if(r.isConfirmed){ window.open('Factura_imprimir.php?id='+conv.factura_id,'_blank'); } });
+                        $('#cotModal').modal('hide');
+                        cargarCotizaciones();
+                    } else {
+                        Swal.fire('Error', conv.message, 'error');
+                    }
+                }, 'json');
+            },
+            error: function(){ Swal.fire('Error','Error procesando la solicitud','error'); }
+        });
+    });
+
     function setEditable(flag){
         $('#cotModal').find('input, select, button#btnAddItem').prop('disabled', !flag);
         if(flag){
             $('#btnSaveCot').show();
+            $('#btnFacturarCot').show();
         } else {
             $('#btnSaveCot').hide();
+            $('#btnFacturarCot').hide();
         }
     }
 
