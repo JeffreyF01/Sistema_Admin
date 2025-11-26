@@ -13,7 +13,7 @@ include '../includes/sidebar.php';
         <div class="container-fluid">
             <div class="row align-items-center">
                 <div class="col">
-                    <h4 class="page-title"><i class="fa-solid fa-receipt me-2"></i>Cotizaciones</h4>
+                    <h4 class="page-title"><i class="fa-solid fa-file-signature me-2"></i>Cotizaciones</h4>
                     <p class="page-subtitle">Crear y gestionar cotizaciones (no afecta inventario)</p>
                 </div>
                 <div class="col-auto">
@@ -44,7 +44,7 @@ include '../includes/sidebar.php';
 
             <div class="card card-custom fade-in">
                 <div class="card-header card-header-custom">
-                    <h5 class="mb-0"><i class="fa-solid fa-receipt me-2"></i>Cotizaciones Recientes</h5>
+                    <h5 class="mb-0"><i class="fa-solid fa-file-signature me-2"></i>Cotizaciones Recientes</h5>
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
@@ -103,7 +103,7 @@ include '../includes/sidebar.php';
                     </div>
 
                     <div class="card mb-3">
-                        <div class="card-header bg-light"><h6 class="mb-0"><i class="fa-solid fa-box me-2"></i>Items</h6></div>
+                        <div class="card-header bg-light"><h6 class="mb-0"><i class="fa-solid fa-boxes-stacked me-2"></i>Items</h6></div>
                         <div class="card-body">
                             <div class="row g-3 mb-3">
                                 <div class="col-md-5">

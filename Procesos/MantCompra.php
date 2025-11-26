@@ -13,7 +13,7 @@ include '../includes/sidebar.php';
         <div class="container-fluid">
             <div class="row align-items-center">
                 <div class="col">
-                    <h4 class="page-title"><i class="fa-solid fa-cart-shopping me-2"></i>Compras</h4>
+                    <h4 class="page-title"><i class="fa-solid fa-truck me-2"></i>Compras</h4>
                     <p class="page-subtitle">Registrar compras de proveedores — aumenta inventario y genera CxP</p>
                 </div>
                 <div class="col-auto">
@@ -40,7 +40,7 @@ include '../includes/sidebar.php';
 
             <div class="card card-custom fade-in">
                 <div class="card-header card-header-custom">
-                    <h5 class="mb-0"><i class="fa-solid fa-boxes-stacked me-2"></i>Compras Recientes</h5>
+                    <h5 class="mb-0"><i class="fa-solid fa-clipboard-list me-2"></i>Compras Recientes</h5>
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
@@ -69,7 +69,7 @@ include '../includes/sidebar.php';
     <div class="modal-dialog modal-xl">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title"><i class="fa-solid fa-cart-plus me-2"></i> Registrar Compra</h5>
+                <h5 class="modal-title"><i class="fa-solid fa-file-circle-plus me-2"></i> Registrar Compra</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
@@ -101,7 +101,7 @@ include '../includes/sidebar.php';
                     </div>
 
                     <div class="card mb-3">
-                        <div class="card-header bg-light"><h6 class="mb-0"><i class="fa-solid fa-box me-2"></i>Items</h6></div>
+                        <div class="card-header bg-light"><h6 class="mb-0"><i class="fa-solid fa-boxes-stacked me-2"></i>Items</h6></div>
                         <div class="card-body">
                             <div class="row g-3 mb-3">
                                 <div class="col-md-5">

@@ -50,7 +50,7 @@ $cotizacion_id = isset($_GET['cotizacion_id']) ? intval($_GET['cotizacion_id']) 
             <!-- Tabla de Facturas -->
             <div class="card card-custom fade-in">
                 <div class="card-header card-header-custom">
-                    <h5 class="mb-0"><i class="fa-solid fa-file-invoice me-2"></i>Facturas Recientes</h5>
+                    <h5 class="mb-0"><i class="fa-solid fa-file-invoice-dollar me-2"></i>Facturas Recientes</h5>
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
@@ -118,7 +118,7 @@ $cotizacion_id = isset($_GET['cotizacion_id']) ? intval($_GET['cotizacion_id']) 
                     <!-- Sección para agregar productos -->
                     <div class="card mb-3">
                         <div class="card-header bg-light">
-                            <h6 class="mb-0"><i class="fa-solid fa-box me-2"></i>Productos</h6>
+                            <h6 class="mb-0"><i class="fa-solid fa-boxes-stacked me-2"></i>Productos</h6>
                         </div>
                         <div class="card-body">
                             <div class="row g-3 mb-3">
