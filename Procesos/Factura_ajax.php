@@ -215,8 +215,22 @@ function obtenerFactura($conexion, $id) {
     $result = $stmt->get_result();
     $factura = $result->fetch_assoc();
 
-    // Obtener detalle
-    $query_detalle = "SELECT fd.*, p.nombre as producto_nombre, p.sku
+    // Obtener detalle con cantidades devueltas
+    $query_detalle = "SELECT fd.*, p.nombre as producto_nombre, p.sku,
+                      COALESCE((SELECT SUM(dd.cantidad) 
+                                FROM devolucion_detalle dd
+                                INNER JOIN devolucion d ON dd.devolucion_id = d.id_devoluciones
+                                WHERE d.factura_id = fd.factura_id 
+                                AND dd.producto_id = fd.producto_id 
+                                AND d.activo = 1 
+                                AND dd.activo = 1), 0) as cantidad_devuelta,
+                      (fd.cantidad - COALESCE((SELECT SUM(dd.cantidad) 
+                                               FROM devolucion_detalle dd
+                                               INNER JOIN devolucion d ON dd.devolucion_id = d.id_devoluciones
+                                               WHERE d.factura_id = fd.factura_id 
+                                               AND dd.producto_id = fd.producto_id 
+                                               AND d.activo = 1 
+                                               AND dd.activo = 1), 0)) as cantidad_neta
                       FROM factura_detalle fd
                       INNER JOIN producto p ON fd.producto_id = p.id_productos
                       WHERE fd.factura_id = ? AND fd.activo = 1";

@@ -33,12 +33,26 @@ if ($result->num_rows == 0) {
 
 $factura = $result->fetch_assoc();
 
-// Obtener detalle de la factura
-$query_detalle = "SELECT fd.*, p.nombre as producto_nombre, p.sku
-                  FROM factura_detalle fd
-                  INNER JOIN producto p ON fd.producto_id = p.id_productos
-                  WHERE fd.factura_id = ? AND fd.activo = 1
-                  ORDER BY fd.id_factura_detalle";
+// Obtener detalle de la factura incluyendo cantidades devueltas y netas
+$query_detalle = "SELECT fd.*, p.nombre AS producto_nombre, p.sku,
+                                    COALESCE((SELECT SUM(dd.cantidad)
+                                                         FROM devolucion_detalle dd
+                                                         INNER JOIN devolucion d ON dd.devolucion_id = d.id_devoluciones
+                                                         WHERE d.factura_id = fd.factura_id
+                                                             AND dd.producto_id = fd.producto_id
+                                                             AND d.activo = 1
+                                                             AND dd.activo = 1), 0) AS cantidad_devuelta,
+                                    (fd.cantidad - COALESCE((SELECT SUM(dd.cantidad)
+                                                                                     FROM devolucion_detalle dd
+                                                                                     INNER JOIN devolucion d ON dd.devolucion_id = d.id_devoluciones
+                                                                                     WHERE d.factura_id = fd.factura_id
+                                                                                         AND dd.producto_id = fd.producto_id
+                                                                                         AND d.activo = 1
+                                                                                         AND dd.activo = 1), 0)) AS cantidad_neta
+                                    FROM factura_detalle fd
+                                    INNER JOIN producto p ON fd.producto_id = p.id_productos
+                                    WHERE fd.factura_id = ? AND fd.activo = 1
+                                    ORDER BY fd.id_factura_detalle";
 
 $stmt_detalle = $conexion->prepare($query_detalle);
 $stmt_detalle->bind_param("i", $factura_id);
@@ -243,36 +257,95 @@ $empresa = $result_empresa->fetch_assoc();
         <table class="table table-bordered invoice-table">
             <thead>
                 <tr>
-                    <th style="width: 15%;">SKU</th>
-                    <th style="width: 40%;">Descripción</th>
-                    <th style="width: 15%;" class="text-center">Cantidad</th>
-                    <th style="width: 15%;" class="text-end">Precio Unit.</th>
-                    <th style="width: 15%;" class="text-end">Subtotal</th>
+                    <th style="width: 12%;">SKU</th>
+                    <th style="width: 32%;">Descripción</th>
+                    <th style="width: 10%;" class="text-center">Cant. Fact.</th>
+                    <th style="width: 10%;" class="text-center">Devuelta</th>
+                    <th style="width: 10%;" class="text-center">Cant. Neta</th>
+                    <th style="width: 13%;" class="text-end">Precio Unit.</th>
+                    <th style="width: 13%;" class="text-end">Subtotal</th>
                 </tr>
             </thead>
             <tbody>
                 <?php 
                 $subtotal_general = 0;
+                $total_devuelto = 0;
+                $hay_devoluciones = false;
+                
+                // Resetear puntero del resultado
+                $result_detalle->data_seek(0);
+                
                 while($item = $result_detalle->fetch_assoc()): 
-                    $subtotal_item = $item['cantidad'] * $item['precio_unitario'];
-                    $subtotal_general += $subtotal_item;
+                    $cantidad = floatval($item['cantidad']);
+                    $cantidad_devuelta = floatval($item['cantidad_devuelta'] ?? 0);
+                    $cantidad_neta = floatval($item['cantidad_neta'] ?? $cantidad);
+                    $precio = floatval($item['precio_unitario']);
+                    
+                    $subtotal_facturado = $cantidad * $precio;
+                    $subtotal_devuelto = $cantidad_devuelta * $precio;
+                    $subtotal_neto = $cantidad_neta * $precio;
+                    
+                    $subtotal_general += $subtotal_facturado;
+                    $total_devuelto += $subtotal_devuelto;
+                    
+                    if ($cantidad_devuelta > 0) {
+                        $hay_devoluciones = true;
+                    }
+                    
+                    $row_style = $cantidad_devuelta > 0 ? 'background-color: #fff3cd;' : '';
                 ?>
-                <tr>
+                <tr style="<?php echo $row_style; ?>">
                     <td><?php echo htmlspecialchars($item['sku']); ?></td>
-                    <td><?php echo htmlspecialchars($item['producto_nombre']); ?></td>
-                    <td class="text-center"><?php echo number_format($item['cantidad'], 2); ?></td>
-                    <td class="text-end">$<?php echo number_format($item['precio_unitario'], 2); ?></td>
-                    <td class="text-end">$<?php echo number_format($subtotal_item, 2); ?></td>
+                    <td>
+                        <?php 
+                        if ($cantidad_devuelta > 0) {
+                            echo '<i class="fas fa-undo text-danger" title="Tiene devoluciones"></i> ';
+                        }
+                        echo htmlspecialchars($item['producto_nombre']); 
+                        ?>
+                    </td>
+                    <td class="text-center"><?php echo number_format($cantidad, 2); ?></td>
+                    <td class="text-center" style="<?php echo $cantidad_devuelta > 0 ? 'color: #dc3545; font-weight: bold;' : ''; ?>">
+                        <?php echo number_format($cantidad_devuelta, 2); ?>
+                    </td>
+                    <td class="text-center" style="<?php echo $cantidad_devuelta > 0 ? 'font-weight: bold;' : ''; ?>">
+                        <?php echo number_format($cantidad_neta, 2); ?>
+                    </td>
+                    <td class="text-end">$<?php echo number_format($precio, 2); ?></td>
+                    <td class="text-end">$<?php echo number_format($subtotal_neto, 2); ?></td>
                 </tr>
                 <?php endwhile; ?>
             </tbody>
             <tfoot>
+                <?php if ($hay_devoluciones): ?>
+                <tr style="background-color: #f8f9fa;">
+                    <td colspan="6" class="text-end" style="font-weight: bold;">Subtotal Facturado:</td>
+                    <td class="text-end" style="font-weight: bold;">$<?php echo number_format($subtotal_general, 2); ?></td>
+                </tr>
+                <tr style="background-color: #f8d7da;">
+                    <td colspan="6" class="text-end" style="color: #dc3545; font-weight: bold;">(-) Total Devuelto:</td>
+                    <td class="text-end" style="color: #dc3545; font-weight: bold;">$<?php echo number_format($total_devuelto, 2); ?></td>
+                </tr>
+                <tr style="background-color: #d1e7dd;">
+                    <td colspan="6" class="text-end invoice-total" style="background-color: #198754;">TOTAL NETO:</td>
+                    <td class="text-end invoice-total" style="background-color: #198754;">$<?php echo number_format($subtotal_general - $total_devuelto, 2); ?></td>
+                </tr>
+                <?php else: ?>
                 <tr>
-                    <td colspan="4" class="text-end invoice-total">TOTAL:</td>
+                    <td colspan="6" class="text-end invoice-total">TOTAL:</td>
                     <td class="text-end invoice-total">$<?php echo number_format($factura['total'], 2); ?></td>
                 </tr>
+                <?php endif; ?>
             </tfoot>
         </table>
+        
+        <?php if ($hay_devoluciones): ?>
+        <div class="alert alert-warning mt-3" style="background-color: #fff3cd; border-left: 4px solid #ffc107; padding: 15px;">
+            <strong><i class="fas fa-info-circle"></i> Nota Importante:</strong> Esta factura tiene productos devueltos. 
+            El total neto refleja el monto real después de aplicar las devoluciones correspondientes.
+        </div>
+        <?php endif; ?>
+
         
         <!-- Footer -->
         <div class="footer-note">

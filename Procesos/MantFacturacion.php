@@ -213,9 +213,11 @@ $cotizacion_id = isset($_GET['cotizacion_id']) ? intval($_GET['cotizacion_id']) 
                         <thead class="table-light">
                             <tr>
                                 <th>Producto</th>
-                                <th style="width: 15%;" class="text-end">Cantidad</th>
-                                <th style="width: 20%;" class="text-end">Precio Unit.</th>
-                                <th style="width: 20%;" class="text-end">Subtotal</th>
+                                <th style="width: 12%;" class="text-end">Cant. Facturada</th>
+                                <th style="width: 12%;" class="text-end">Cant. Devuelta</th>
+                                <th style="width: 12%;" class="text-end">Cant. Neta</th>
+                                <th style="width: 15%;" class="text-end">Precio Unit.</th>
+                                <th style="width: 15%;" class="text-end">Subtotal</th>
                             </tr>
                         </thead>
                         <tbody id="df-detalle"></tbody>
@@ -638,21 +640,72 @@ $(document).ready(function() {
                 const $tbody = $('#df-detalle');
                 $tbody.empty();
                 let total = 0;
+                let totalDevuelto = 0;
+                let hayDevoluciones = false;
+                
                 (f.detalle || []).forEach(function(it){
                     const cantidad = parseFloat(it.cantidad) || 0;
+                    const cantidadDevuelta = parseFloat(it.cantidad_devuelta) || 0;
+                    const cantidadNeta = parseFloat(it.cantidad_neta) || 0;
                     const precio = parseFloat(it.precio_unitario) || 0;
-                    const subtotal = cantidad * precio;
-                    total += subtotal;
+                    const subtotalFacturado = cantidad * precio;
+                    const subtotalDevuelto = cantidadDevuelta * precio;
+                    const subtotalNeto = cantidadNeta * precio;
+                    
+                    total += subtotalFacturado;
+                    totalDevuelto += subtotalDevuelto;
+                    
+                    if (cantidadDevuelta > 0) {
+                        hayDevoluciones = true;
+                    }
+                    
+                    const rowClass = cantidadDevuelta > 0 ? 'table-warning' : '';
+                    const devueltaBadge = cantidadDevuelta > 0 ? '<i class="fa-solid fa-rotate-left text-danger" title="Tiene devoluciones"></i> ' : '';
+                    
                     $tbody.append(`
-                        <tr>
-                            <td>${it.producto_nombre || ''}</td>
+                        <tr class="${rowClass}">
+                            <td>${devueltaBadge}${it.producto_nombre || ''}</td>
                             <td class="text-end">${cantidad.toLocaleString(undefined,{maximumFractionDigits:2})}</td>
+                            <td class="text-end ${cantidadDevuelta > 0 ? 'text-danger fw-bold' : ''}">${cantidadDevuelta.toLocaleString(undefined,{maximumFractionDigits:2})}</td>
+                            <td class="text-end ${cantidadDevuelta > 0 ? 'fw-bold' : ''}">${cantidadNeta.toLocaleString(undefined,{maximumFractionDigits:2})}</td>
                             <td class="text-end">$${precio.toFixed(2)}</td>
-                            <td class="text-end">$${subtotal.toFixed(2)}</td>
+                            <td class="text-end">$${subtotalNeto.toFixed(2)}</td>
                         </tr>
                     `);
                 });
-                $('#df-total').text(`$${total.toFixed(2)}`);
+                
+                // Agregar filas de totales y actualizar total visible superior
+                let totalNeto = total - totalDevuelto;
+                if (hayDevoluciones) {
+                    $tbody.append(`
+                        <tr class="table-light fw-bold">
+                            <td colspan="5" class="text-end">Subtotal Facturado:</td>
+                            <td class="text-end">$${total.toFixed(2)}</td>
+                        </tr>
+                        <tr class="table-danger">
+                            <td colspan="5" class="text-end text-danger">(-) Total Devuelto:</td>
+                            <td class="text-end text-danger">$${totalDevuelto.toFixed(2)}</td>
+                        </tr>
+                        <tr class="table-success fw-bold">
+                            <td colspan="5" class="text-end">Total Neto:</td>
+                            <td class="text-end text-success">$${totalNeto.toFixed(2)}</td>
+                        </tr>
+                    `);
+
+                    // Mostrar el total neto arriba, con tooltip explicativo
+                    $('#df-total')
+                        .text(`$${totalNeto.toFixed(2)}`)
+                        .attr('title', `Facturado: $${total.toFixed(2)} | Devuelto: $${totalDevuelto.toFixed(2)} | Neto: $${totalNeto.toFixed(2)}`)
+                        .addClass('text-decoration-underline')
+                        .css('cursor','help');
+                } else {
+                    $('#df-total')
+                        .text(`$${total.toFixed(2)}`)
+                        .attr('title','Total facturado')
+                        .removeClass('text-decoration-underline')
+                        .css('cursor','default');
+                }
+
 
                 $('#df-imprimir').off('click').on('click', function(){
                     imprimirFactura(id);
