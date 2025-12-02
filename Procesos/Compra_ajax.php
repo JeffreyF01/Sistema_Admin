@@ -129,39 +129,51 @@ function guardarCompra($conexion, $data, $usuario_id) {
         }
 
         /* ---------------- CXP ---------------- */
-        $dias_plazo = 0;
-        $fecha_venc = null;
+        /* ============================================================
+            CUENTAS POR PAGAR (SOLO SI ES CRÉDITO)
+============================================================ */
+$dias_plazo = 0;
+$fecha_venc = null;
 
-        if ($condicion_id) {
-            $stmtCond = $conexion->prepare("SELECT dias_plazo FROM condicion_pago WHERE id_condiciones_pago = ?");
-            $stmtCond->bind_param("i", $condicion_id);
-            $stmtCond->execute();
-            $cond = $stmtCond->get_result()->fetch_assoc();
+// Buscar días de plazo de la condición
+if ($condicion_id) {
+    $stmtCond = $conexion->prepare("SELECT dias_plazo FROM condicion_pago WHERE id_condiciones_pago = ?");
+    $stmtCond->bind_param("i", $condicion_id);
+    $stmtCond->execute();
+    $cond = $stmtCond->get_result()->fetch_assoc();
 
-            $dias_plazo = intval($cond['dias_plazo'] ?? 0);
-            $fecha_venc = ($dias_plazo > 0)
-                ? date("Y-m-d", strtotime("$fecha + $dias_plazo days"))
-                : $fecha;
-        }
+    $dias_plazo = intval($cond['dias_plazo'] ?? 0);
+    $fecha_venc = ($dias_plazo > 0)
+        ? date("Y-m-d", strtotime("$fecha + $dias_plazo days"))
+        : $fecha;
+}
 
-        $stmtCxp = $conexion->prepare(
-            "INSERT INTO cxp (compra_id, proveedor_id, condicion_id, fecha, fecha_vencimiento, monto, saldo, activo)
-             VALUES (?, ?, ?, ?, ?, ?, ?, 1)"
-        );
+/* SOLO generar CxP si es crédito (dias_plazo > 0) */
+if ($dias_plazo > 0) {
 
-        $saldo = $total;
+    $stmtCxp = $conexion->prepare(
+        "INSERT INTO cxp (compra_id, proveedor_id, condicion_id, fecha, fecha_vencimiento, monto, saldo, activo)
+         VALUES (?, ?, ?, ?, ?, ?, ?, 1)"
+    );
 
-        $stmtCxp->bind_param("iiissdd",
-            $compra_id,
-            $proveedor_id,
-            $condicion_id,
-            $fecha,
-            $fecha_venc,
-            $total,
-            $saldo
-        );
+    $saldo = $total;
 
-        if (!$stmtCxp->execute()) throw new Exception("Error insert CXP: " . $stmtCxp->error);
+    $stmtCxp->bind_param("iiissdd",
+        $compra_id,
+        $proveedor_id,
+        $condicion_id,
+        $fecha,
+        $fecha_venc,
+        $total,
+        $saldo
+    );
+
+    if (!$stmtCxp->execute()) 
+        throw new Exception("Error insert CXP: " . $stmtCxp->error);
+
+}
+/* Si es contado: NO crear CxP y NO registrar pago automático */
+
 
         /* ---------------- SI ES CONTADO → PAGAR ---------------- */
         if ($dias_plazo === 0) {
