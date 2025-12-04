@@ -120,51 +120,31 @@ include '../includes/sidebar.php';
                         </div>
                     </div>
 
-                    <!-- Sección para agregar productos a devolver -->
+                    <!-- Tabla de productos disponibles para devolver -->
                     <div class="card mb-3" id="productosSection" style="display:none;">
-                        <div class="card-header bg-light">
-                            <h6 class="mb-0"><i class="fa-solid fa-boxes-stacked me-2"></i>Productos de la Factura</h6>
+                        <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                            <h6 class="mb-0"><i class="fa-solid fa-boxes-stacked me-2"></i>Productos Disponibles para Devolución</h6>
+                            <small class="text-muted">Seleccione las cantidades a devolver</small>
                         </div>
                         <div class="card-body">
-                            <div class="row g-3 mb-3">
-                                <div class="col-md-5">
-                                    <label for="productoId" class="form-label">Producto</label>
-                                    <select class="form-select form-control-custom" id="productoId">
-                                        <option value="">Seleccione un producto...</option>
-                                    </select>
-                                </div>
-                                <div class="col-md-2">
-                                    <label for="cantidadFactura" class="form-label">Cant. Facturada</label>
-                                    <input type="number" class="form-control form-control-custom" id="cantidadFactura" readonly>
-                                </div>
-                                <div class="col-md-2">
-                                    <label for="cantidad" class="form-label">Cant. Devolver</label>
-                                    <input type="number" class="form-control form-control-custom" id="cantidad" min="1" step="1" value="1">
-                                </div>
-                                <div class="col-md-2">
-                                    <label for="precio" class="form-label">Precio Unit.</label>
-                                    <input type="number" class="form-control form-control-custom" id="precio" readonly>
-                                </div>
-                                <div class="col-md-1 d-flex align-items-end">
-                                    <button type="button" class="btn btn-success w-100" id="agregarProducto">
-                                        <i class="fa-solid fa-plus"></i>
-                                    </button>
-                                </div>
-                            </div>
-
-                            <!-- Tabla de productos a devolver -->
                             <div class="table-responsive">
-                                <table class="table table-sm table-bordered" id="detalleTable">
+                                <table class="table table-hover table-bordered align-middle" id="productosFacturaTable">
                                     <thead class="table-light">
                                         <tr>
-                                            <th style="width: 40%;">Producto</th>
-                                            <th style="width: 15%;">Cantidad</th>
-                                            <th style="width: 15%;">Precio Unit.</th>
-                                            <th style="width: 15%;">Subtotal</th>
-                                            <th style="width: 15%;">Acciones</th>
+                                            <th style="width: 5%;" class="text-center">
+                                                <input type="checkbox" id="seleccionarTodos" title="Seleccionar todos">
+                                            </th>
+                                            <th style="width: 35%;">Producto</th>
+                                            <th style="width: 12%;" class="text-center">Cant. Facturada</th>
+                                            <th style="width: 12%;" class="text-center">Ya Devuelta</th>
+                                            <th style="width: 12%;" class="text-center">Disponible</th>
+                                            <th style="width: 12%;" class="text-center">Cant. a Devolver</th>
+                                            <th style="width: 12%;" class="text-end">Precio Unit.</th>
                                         </tr>
                                     </thead>
-                                    <tbody></tbody>
+                                    <tbody id="productosFacturaBody">
+                                        <!-- Se llenará dinámicamente -->
+                                    </tbody>
                                 </table>
                             </div>
                         </div>
@@ -267,7 +247,7 @@ $(document).ready(function() {
         detalleItems = [];
         facturaProductos = [];
         facturaSeleccionada = null;
-        actualizarTablaDetalle();
+        $('#productosFacturaBody').empty();
         $('#facturaInfo').hide();
         $('#productosSection').hide();
         $('#devolucionModalLabel').html('<i class="fa-solid fa-rotate-left me-2"></i>Nueva Devolución');
@@ -283,88 +263,26 @@ $(document).ready(function() {
             $('#productosSection').hide();
             facturaProductos = [];
             detalleItems = [];
-            actualizarTablaDetalle();
+            $('#productosFacturaBody').empty();
         }
     });
 
-    // Al seleccionar un producto
-    $('#productoId').on('change', function() {
-        const productoId = $(this).val();
-        if (productoId) {
-            const selectedOption = $(this).find('option:selected');
-            const cantidadDisponible = parseFloat(selectedOption.data('cantidad-disponible')) || 0;
-            const cantidadOriginal = parseFloat(selectedOption.data('cantidad-original')) || 0;
-            const cantidadDevuelta = parseFloat(selectedOption.data('cantidad-devuelta')) || 0;
-            
-            const producto = facturaProductos.find(p => p.producto_id == productoId);
-            if (producto) {
-                $('#cantidadFactura').val(cantidadOriginal.toFixed(2) + ' (Devuelto: ' + cantidadDevuelta.toFixed(2) + ')');
-                $('#precio').val(parseFloat(producto.precio_unitario).toFixed(2));
-                $('#cantidad').attr('max', cantidadDisponible).val(Math.min(1, cantidadDisponible));
-            }
-        } else {
-            $('#cantidadFactura').val('');
-            $('#precio').val('');
-            $('#cantidad').val('1');
-        }
-    });
-
-    // Agregar producto al detalle
-    $('#agregarProducto').click(function() {
-        const productoId = $('#productoId').val();
-        const cantidad = parseFloat($('#cantidad').val()) || 0;
-        const precio = parseFloat($('#precio').val()) || 0;
-
-        if (!productoId) {
-            Swal.fire('Error', 'Seleccione un producto', 'error');
-            return;
-        }
-
-        if (cantidad <= 0) {
-            Swal.fire('Error', 'La cantidad debe ser mayor a 0', 'error');
-            return;
-        }
-
-        const selectedOption = $('#productoId').find('option:selected');
-        const cantidadDisponible = parseFloat(selectedOption.data('cantidad-disponible')) || 0;
+    // Checkbox seleccionar todos
+    $('#seleccionarTodos').on('change', function() {
+        const isChecked = $(this).is(':checked');
+        $('.producto-checkbox').prop('checked', isChecked);
         
-        const producto = facturaProductos.find(p => p.producto_id == productoId);
-        
-        if (!producto) {
-            Swal.fire('Error', 'Producto no encontrado', 'error');
-            return;
-        }
-        
-        // Verificar si ya existe en el detalle
-        const existente = detalleItems.find(item => item.producto_id == productoId);
-        const cantidadYaDevuelta = existente ? existente.cantidad : 0;
-        const cantidadTotal = cantidadYaDevuelta + cantidad;
-
-        if (cantidadTotal > cantidadDisponible) {
-            Swal.fire('Error', `No puede devolver más de lo disponible. Cantidad disponible: ${cantidadDisponible.toFixed(2)}`, 'error');
-            return;
-        }
-
-        if (existente) {
-            existente.cantidad = cantidadTotal;
-            existente.subtotal = existente.cantidad * existente.precio_unitario;
-        } else {
-            detalleItems.push({
-                producto_id: productoId,
-                nombre: producto.producto_nombre,
-                cantidad: cantidad,
-                precio_unitario: precio,
-                subtotal: cantidad * precio
+        if (isChecked) {
+            // Auto-llenar con cantidad disponible
+            $('.cantidad-devolver').each(function() {
+                const maxCant = parseFloat($(this).attr('max')) || 0;
+                if (maxCant > 0) {
+                    $(this).val(maxCant);
+                }
             });
+        } else {
+            $('.cantidad-devolver').val('');
         }
-
-        // Limpiar campos
-        $('#productoId').val('');
-        $('#cantidad').val('1');
-        $('#precio').val('');
-        $('#cantidadFactura').val('');
-
-        actualizarTablaDetalle();
     });
 
     // Guardar devolución
@@ -504,34 +422,101 @@ $(document).ready(function() {
                     if (facturaProductos.length === 0) {
                         Swal.fire('Información', 'Esta factura no tiene productos disponibles para devolver o ya fueron devueltos en su totalidad.', 'info');
                         $('#productosSection').hide();
-                        detalleItems = [];
-                        actualizarTablaDetalle();
+                        $('#productosFacturaBody').empty();
                         return;
                     }
                     
-                    let optionsProductos = '<option value="">Seleccione un producto...</option>';
+                    // Construir tabla con todos los productos
+                    let htmlRows = '';
                     facturaProductos.forEach(function(producto) {
                         const cantDisponible = parseFloat(producto.cantidad_disponible || producto.cantidad);
                         const cantDevuelta = parseFloat(producto.cantidad_devuelta || 0);
                         const cantOriginal = parseFloat(producto.cantidad);
+                        const precio = parseFloat(producto.precio_unitario);
                         
-                        optionsProductos += `<option value="${producto.producto_id}" 
-                            data-cantidad-disponible="${cantDisponible}"
-                            data-cantidad-original="${cantOriginal}"
-                            data-cantidad-devuelta="${cantDevuelta}">
-                            ${producto.producto_nombre} - Disponible: ${cantDisponible.toFixed(2)} (Facturado: ${cantOriginal.toFixed(2)}) - $${parseFloat(producto.precio_unitario).toFixed(2)}
-                        </option>`;
+                        if (cantDisponible > 0) {
+                            htmlRows += `<tr data-producto-id="${producto.producto_id}" data-precio="${precio}">
+                                <td class="text-center">
+                                    <input type="checkbox" class="form-check-input producto-checkbox">
+                                </td>
+                                <td>${producto.producto_nombre}</td>
+                                <td class="text-center">${cantOriginal.toFixed(2)}</td>
+                                <td class="text-center text-danger">${cantDevuelta.toFixed(2)}</td>
+                                <td class="text-center text-success"><strong>${cantDisponible.toFixed(2)}</strong></td>
+                                <td>
+                                    <input type="number" class="form-control form-control-sm cantidad-devolver" 
+                                        min="0" max="${cantDisponible}" step="0.01" value="" 
+                                        style="width: 100px;">
+                                </td>
+                                <td class="text-end">$${precio.toFixed(2)}</td>
+                            </tr>`;
+                        }
                     });
-                    $('#productoId').html(optionsProductos);
                     
+                    $('#productosFacturaBody').html(htmlRows);
                     $('#productosSection').show();
                     
-                    // Limpiar detalle anterior
-                    detalleItems = [];
-                    actualizarTablaDetalle();
+                    // Agregar eventos a las filas
+                    agregarEventosTablaProductos();
                 }
             }
         });
+    }
+
+    function agregarEventosTablaProductos() {
+        // Evento cuando cambia un checkbox
+        $('.producto-checkbox').on('change', function() {
+            const row = $(this).closest('tr');
+            const input = row.find('.cantidad-devolver');
+            const maxCant = parseFloat(input.attr('max'));
+            
+            if ($(this).is(':checked')) {
+                input.val(maxCant);
+                row.addClass('table-primary');
+            } else {
+                input.val('');
+                row.removeClass('table-primary');
+            }
+            calcularTotal();
+        });
+
+        // Evento cuando cambia la cantidad
+        $('.cantidad-devolver').on('input', function() {
+            const row = $(this).closest('tr');
+            const checkbox = row.find('.producto-checkbox');
+            const cantidad = parseFloat($(this).val()) || 0;
+            const maxCant = parseFloat($(this).attr('max'));
+            
+            // Validar que no exceda el máximo
+            if (cantidad > maxCant) {
+                $(this).val(maxCant);
+                Swal.fire('Advertencia', 'La cantidad no puede superar lo disponible', 'warning');
+            }
+            
+            // Marcar checkbox si hay cantidad
+            if (cantidad > 0) {
+                checkbox.prop('checked', true);
+                row.addClass('table-primary');
+            } else {
+                checkbox.prop('checked', false);
+                row.removeClass('table-primary');
+            }
+            
+            calcularTotal();
+        });
+    }
+
+    function calcularTotal() {
+        let total = 0;
+        $('#productosFacturaBody tr').each(function() {
+            const checkbox = $(this).find('.producto-checkbox');
+            if (checkbox.is(':checked')) {
+                const cantidad = parseFloat($(this).find('.cantidad-devolver').val()) || 0;
+                const precio = parseFloat($(this).data('precio')) || 0;
+                total += cantidad * precio;
+            }
+        });
+        $('#total').text('$' + total.toFixed(2));
     }
 
     function generarNumeroDocumento() {
@@ -547,36 +532,82 @@ $(document).ready(function() {
         });
     }
 
-    function actualizarTablaDetalle() {
-        let html = '';
-        let total = 0;
+    // Guardar devolución
+    $('#guardarDevolucion').click(function() {
+        const facturaId = $('#facturaId').val();
+        const observacion = $('#observacion').val();
+        const numeroDocumento = $('#numeroDocumento').val();
+        const fecha = $('#fecha').val();
 
-        detalleItems.forEach(function(item, index) {
-            total += item.subtotal;
-            const cantidad = parseFloat(item.cantidad) || 0;
-            const precioUnit = parseFloat(item.precio_unitario) || 0;
-            const subtotal = parseFloat(item.subtotal) || 0;
-            html += `<tr>
-                <td>${item.nombre}</td>
-                <td>${cantidad}</td>
-                <td>$${precioUnit.toFixed(2)}</td>
-                <td>$${subtotal.toFixed(2)}</td>
-                <td>
-                    <button type="button" class="btn btn-sm btn-danger" onclick="eliminarItem(${index})" title="Eliminar">
-                        <i class="fa-solid fa-trash"></i>
-                    </button>
-                </td>
-            </tr>`;
+        if (!facturaId) {
+            Swal.fire('Error', 'Seleccione una factura', 'error');
+            return;
+        }
+
+        if (!numeroDocumento) {
+            Swal.fire('Error', 'El número de documento es requerido', 'error');
+            return;
+        }
+
+        if (!fecha) {
+            Swal.fire('Error', 'La fecha es requerida', 'error');
+            return;
+        }
+
+        // Construir detalleItems desde la tabla
+        detalleItems = [];
+        $('#productosFacturaBody tr').each(function() {
+            const checkbox = $(this).find('.producto-checkbox');
+            if (checkbox.is(':checked')) {
+                const cantidad = parseFloat($(this).find('.cantidad-devolver').val()) || 0;
+                if (cantidad > 0) {
+                    const precio = parseFloat($(this).data('precio'));
+                    detalleItems.push({
+                        producto_id: $(this).data('productoId'),
+                        nombre: $(this).find('td:eq(1)').text(),
+                        cantidad: cantidad,
+                        precio_unitario: precio,
+                        subtotal: cantidad * precio
+                    });
+                }
+            }
         });
 
-        $('#detalleTable tbody').html(html || '<tr><td colspan="5" class="text-center">No hay productos agregados</td></tr>');
-        $('#totalDevolucion').text('$' + total.toFixed(2));
-    }
+        if (detalleItems.length === 0) {
+            Swal.fire('Error', 'Debe seleccionar al menos un producto con cantidad mayor a 0', 'error');
+            return;
+        }
 
-    window.eliminarItem = function(index) {
-        detalleItems.splice(index, 1);
-        actualizarTablaDetalle();
-    };
+        const data = {
+            accion: 'guardar',
+            numero_documento: numeroDocumento,
+            factura_id: facturaId,
+            fecha: fecha,
+            observacion: observacion,
+            detalle: detalleItems
+        };
+
+        $.ajax({
+            url: 'Devolucion_ajax.php',
+            type: 'POST',
+            data: JSON.stringify(data),
+            contentType: 'application/json',
+            dataType: 'json',
+            success: function(response) {
+                if (response.success) {
+                    Swal.fire('Éxito', 'Devolución guardada correctamente', 'success');
+                    $('#devolucionModal').modal('hide');
+                    tablaDevoluciones.ajax.reload();
+                } else {
+                    Swal.fire('Error', response.message || response.error || 'Error al guardar', 'error');
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error('Error AJAX:', xhr.responseText);
+                Swal.fire('Error', 'Error al procesar la solicitud: ' + error, 'error');
+            }
+        });
+    });
 
     window.imprimirDevolucion = function(id) {
         window.open('Devolucion_imprimir.php?id=' + id, '_blank');
