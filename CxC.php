@@ -48,7 +48,7 @@ include 'includes/sidebar.php';
 
             <!-- PROCESOS -->
             <div class="col-md-3">
-                <a href="#" class="card-dashboard">
+                <a href="MantCobro.php" class="card-dashboard">
                     <i class="fa-solid fa-money-bill-transfer"></i>
                     <h5>Cobro</h5>
                     <p>Registro de pagos y transacciones</p>

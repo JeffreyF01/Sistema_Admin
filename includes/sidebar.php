@@ -114,6 +114,7 @@ function nav_link($url, $icon, $label, $allowed, $isActive = false) {
                 echo nav_link($baseUrl.'Procesos/MantCompra.php', 'fa-solid fa-truck', 'Compra', ($perms['inv_compras'] ?? 0), $current === 'MantCompra.php');
                 echo nav_link($baseUrl.'Procesos/MantDevolucion.php', 'fa-solid fa-rotate-left', 'Devoluciones', ($perms['inv_devoluciones'] ?? 0), $current === 'MantDevolucion.php');
                 echo nav_link($baseUrl.'Procesos/MantPago.php', 'fa-solid fa-money-check-dollar', 'Pago', ($perms['exp_pagos'] ?? 0), $current === 'MantPago.php');
+                echo nav_link($baseUrl.'Procesos/MantCobro.php', 'fa-solid fa-money-check-dollar', 'Cobro', ($perms['exp_pagos'] ?? 0), $current === 'MantCobro.php');
                 ?>
             </div>
         </div>
