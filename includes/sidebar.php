@@ -17,6 +17,7 @@ $procesoPages = [
     'MantFacturacion.php',
     'MantCotizacion.php',
     'MantCompra.php',
+    'MantMovimiento.php',
     'MantPago.php',
     'MantDevolucion.php'
 ];
@@ -112,6 +113,7 @@ function nav_link($url, $icon, $label, $allowed, $isActive = false) {
                 echo nav_link($baseUrl.'Procesos/MantFacturacion.php', 'fa-solid fa-file-invoice-dollar', 'Facturación', ($perms['inv_facturacion'] ?? 0), $current === 'MantFacturacion.php');
                 echo nav_link($baseUrl.'Procesos/MantCotizacion.php', 'fa-solid fa-file-signature', 'Cotización', ($perms['inv_cotizaciones'] ?? 0), $current === 'MantCotizacion.php');
                 echo nav_link($baseUrl.'Procesos/MantCompra.php', 'fa-solid fa-truck', 'Compra', ($perms['inv_compras'] ?? 0), $current === 'MantCompra.php');
+                echo nav_link($baseUrl.'Procesos/MantMovimiento.php', 'fa-solid fa-boxes-stacked', 'Movimientos', ($perms['inv_movimientos'] ?? 0), $current === 'MantMovimiento.php');
                 echo nav_link($baseUrl.'Procesos/MantDevolucion.php', 'fa-solid fa-rotate-left', 'Devoluciones', ($perms['inv_devoluciones'] ?? 0), $current === 'MantDevolucion.php');
                 echo nav_link($baseUrl.'Procesos/MantPago.php', 'fa-solid fa-money-check-dollar', 'Pago', ($perms['exp_pagos'] ?? 0), $current === 'MantPago.php');
                 echo nav_link($baseUrl.'Procesos/MantCobro.php', 'fa-solid fa-money-check-dollar', 'Cobro', ($perms['exp_pagos'] ?? 0), $current === 'MantCobro.php');
