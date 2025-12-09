@@ -75,8 +75,11 @@ include "includes/sidebar.php";
 
                                     <div class="col-md-6 mb-4">
                                         <label class="form-label text-required">Nombre del Grupo</label>
-                                        <input type="text" name="nombre" id="nombre" class="form-control form-control-custom" required 
-                                               placeholder="Ej: Laptops, Smartphones, Accesorios">
+                                        <input type="text" name="nombre" id="nombre" class="form-control form-control-custom" 
+                                               pattern="[A-Za-z0-9ÁÉÍÓÚáéíóúÑñ\s]+" 
+                                               title="Solo letras, números y espacios" 
+                                               maxlength="80" 
+                                               placeholder="Ej: Laptops, Smartphones, Accesorios" required>
                                     </div>
                                 </div>
 

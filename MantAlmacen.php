@@ -45,13 +45,20 @@ include "includes/sidebar.php";
                             <form id="formAlmacen">
                                 <input type="hidden" name="id_almacen" id="id_almacen">
                                 <div class="row mb-3">
-                                    <div class="col-md-6">
-                                        <label class="form-label">Código</label>
-                                        <input type="text" name="codigo" id="codigo" class="form-control" required>
+                                    <div class="col-md-4">
+                                        <label class="form-label">Código <span class="text-danger">*</span></label>
+                                        <input type="text" name="codigo" id="codigo" class="form-control" 
+                                               pattern="[A-Za-z0-9\-_]+" 
+                                               title="Solo alfanumérico, guiones" 
+                                               maxlength="40" 
+                                               style="text-transform:uppercase" 
+                                               placeholder="ALM-001" required>
                                     </div>
-                                    <div class="col-md-6">
-                                        <label class="form-label">Nombre</label>
-                                        <input type="text" name="nombre" id="nombre" class="form-control" required>
+                                    <div class="col-md-8">
+                                        <label class="form-label">Nombre <span class="text-danger">*</span></label>
+                                        <input type="text" name="nombre" id="nombre" class="form-control" 
+                                               maxlength="120" 
+                                               placeholder="Almacén Principal" required>
                                     </div>
                                 </div>
                                 <div class="mb-3">

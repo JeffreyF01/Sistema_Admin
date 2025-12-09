@@ -63,12 +63,19 @@ include "includes/sidebar.php";
                                 <div class="row">
                                     <div class="col-md-4 mb-4">
                                         <label class="form-label text-required">Código de Ubicación</label>
-                                        <input type="text" name="codigo" id="codigo" class="form-control form-control-custom" required placeholder="Ej: UBI-001">
+                                        <input type="text" name="codigo" id="codigo" class="form-control form-control-custom" 
+                                               pattern="[A-Za-z0-9\-_]+" 
+                                               title="Solo alfanumérico, guiones" 
+                                               maxlength="40" 
+                                               style="text-transform:uppercase" 
+                                               placeholder="Ej: UBI-001" required>
                                     </div>
 
                                     <div class="col-md-8 mb-4">
                                         <label class="form-label text-required">Nombre de la Ubicación</label>
-                                        <input type="text" name="nombre" id="nombre" class="form-control form-control-custom" required placeholder="Ej: Estantería A - Nivel 1">
+                                        <input type="text" name="nombre" id="nombre" class="form-control form-control-custom" 
+                                               maxlength="120" 
+                                               placeholder="Ej: Estantería A - Nivel 1" required>
                                     </div>
                                 </div>
 

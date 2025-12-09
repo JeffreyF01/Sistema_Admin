@@ -47,22 +47,32 @@ include "includes/sidebar.php";
                                 <input type="hidden" name="id_monedas" id="id_monedas">
                                 <div class="row mb-3">
                                     <div class="col-md-6">
-                                        <label class="form-label">Código</label>
-                                        <input type="text" name="codigo" id="codigo" class="form-control" required>
+                                        <label class="form-label">Código <span class="text-danger">*</span></label>
+                                        <input type="text" name="codigo" id="codigo" class="form-control" 
+                                               pattern="[A-Z]{3}" 
+                                               title="3 letras mayúsculas (ej: USD, EUR, DOP)" 
+                                               maxlength="3" 
+                                               placeholder="USD" 
+                                               style="text-transform:uppercase" required>
                                     </div>
                                     <div class="col-md-6">
-                                        <label class="form-label">Nombre</label>
-                                        <input type="text" name="nombre" id="nombre" class="form-control" required>
+                                        <label class="form-label">Nombre <span class="text-danger">*</span></label>
+                                        <input type="text" name="nombre" id="nombre" class="form-control" 
+                                               maxlength="50" 
+                                               placeholder="Dólar Estadounidense" required>
                                     </div>
                                 </div>
                                 <div class="row mb-3">
                                     <div class="col-md-6">
                                         <label class="form-label">Símbolo</label>
-                                        <input type="text" name="simbolo" id="simbolo" class="form-control">
+                                        <input type="text" name="simbolo" id="simbolo" class="form-control" 
+                                               maxlength="6" 
+                                               placeholder="$">
                                     </div>
                                     <div class="col-md-6">
-                                        <label class="form-label">Tasa de cambio</label>
-                                        <input type="number" step="0.01" name="tasa_cambio" id="tasa_cambio" class="form-control" required>
+                                        <label class="form-label">Tasa de cambio <span class="text-danger">*</span></label>
+                                        <input type="number" step="0.000001" min="0.000001" name="tasa_cambio" id="tasa_cambio" 
+                                               class="form-control" placeholder="1.000000" required>
                                     </div>
                                 </div>
                                 <div class="mb-3">

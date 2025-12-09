@@ -48,12 +48,18 @@ include "includes/sidebar.php";
 
                                 <div class="row mb-3">
                                     <div class="col-md-4">
-                                        <label class="form-label">SKU</label>
-                                        <input type="text" name="sku" id="sku" class="form-control" required>
+                                        <label class="form-label">SKU <span class="text-danger">*</span></label>
+                                        <input type="text" name="sku" id="sku" class="form-control" 
+                                               pattern="[A-Za-z0-9\-_]+" 
+                                               title="Solo letras, números, guiones" 
+                                               maxlength="60" required>
                                     </div>
                                     <div class="col-md-8">
-                                        <label class="form-label">Nombre</label>
-                                        <input type="text" name="nombre" id="nombre" class="form-control" required>
+                                        <label class="form-label">Nombre <span class="text-danger">*</span></label>
+                                        <input type="text" name="nombre" id="nombre" class="form-control" 
+                                               pattern="[A-Za-z0-9ÁÉÍÓÚáéíóúÑñ\s,.\-]+" 
+                                               title="Solo letras, números y espacios" 
+                                               maxlength="160" required>
                                     </div>
                                 </div>
 
@@ -98,16 +104,18 @@ include "includes/sidebar.php";
 
                                 <div class="row mb-3">
                                     <div class="col-md-3">
-                                        <label class="form-label">Unidad</label>
-                                        <input type="text" name="unidad" id="unidad" class="form-control" required>
+                                        <label class="form-label">Unidad <span class="text-danger">*</span></label>
+                                        <input type="text" name="unidad" id="unidad" class="form-control" 
+                                               maxlength="20" 
+                                               placeholder="Ej: UND, KG, LT" required>
                                     </div>
                                     <div class="col-md-3">
-                                        <label class="form-label">Stock</label>
-                                        <input type="number" step="1" min="0" name="stock" id="stock" class="form-control" required>
+                                        <label class="form-label">Stock <span class="text-danger">*</span></label>
+                                        <input type="number" step="0.01" min="0" name="stock" id="stock" class="form-control" required>
                                     </div>
                                     <div class="col-md-3">
-                                        <label class="form-label">Stock Mín.</label>
-                                        <input type="number" step="1" min="0" name="stock_min" id="stock_min" class="form-control" required>
+                                        <label class="form-label">Stock Mín. <span class="text-danger">*</span></label>
+                                        <input type="number" step="0.01" min="0" name="stock_min" id="stock_min" class="form-control" required>
                                     </div>
                                     <div class="col-md-3">
                                         <label class="form-label">Estado</label>
@@ -120,12 +128,14 @@ include "includes/sidebar.php";
 
                                 <div class="row mb-3">
                                     <div class="col-md-6">
-                                        <label class="form-label">Precio Venta</label>
-                                        <input type="number" step="0.01" name="precio_venta" id="precio_venta" class="form-control" required>
+                                        <label class="form-label">Precio Venta <span class="text-danger">*</span></label>
+                                        <input type="number" step="0.01" min="0.01" name="precio_venta" id="precio_venta" 
+                                               class="form-control" placeholder="0.00" required>
                                     </div>
                                     <div class="col-md-6">
-                                        <label class="form-label">Costo</label>
-                                        <input type="number" step="0.01" name="costo" id="costo" class="form-control" required>
+                                        <label class="form-label">Costo <span class="text-danger">*</span></label>
+                                        <input type="number" step="0.01" min="0" name="costo" id="costo" 
+                                               class="form-control" placeholder="0.00" required>
                                     </div>
                                 </div>
 
@@ -225,6 +235,11 @@ $("#btnAbrirModal").click(function(){
 
 $("#formProducto").on("submit", function(e){
     e.preventDefault();
+    
+    // Validar formulario antes de enviar
+    if (!Validaciones.validarFormulario('#formProducto')) {
+        return false;
+    }
 
     let accion = $("#id_productos").val() ? "editar" : "agregar";
     let formData = $(this).serialize() + "&accion=" + accion;

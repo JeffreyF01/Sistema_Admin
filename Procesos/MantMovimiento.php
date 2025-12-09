@@ -101,7 +101,9 @@ include '../includes/sidebar.php';
                     <div class="row g-3 mb-3">
                         <div class="col-md-6">
                             <label class="form-label">Referencia / Nota</label>
-                            <input type="text" id="referencia" class="form-control" placeholder="Ej: Ajuste por inventario físico">
+                            <input type="text" id="referencia" class="form-control" 
+                                   maxlength="120" 
+                                   placeholder="Ej: Ajuste por inventario físico">
                         </div>
                     </div>
 
@@ -117,11 +119,13 @@ include '../includes/sidebar.php';
                                 </div>
                                 <div class="col-md-2">
                                     <label>Cantidad</label>
-                                    <input type="number" id="cantidad" class="form-control" min="0.01" step="0.01" value="1">
+                                    <input type="number" id="cantidad" class="form-control" 
+                                           min="0.01" step="0.01" value="1" placeholder="1.00">
                                 </div>
                                 <div class="col-md-3">
                                     <label>Costo unit. (opcional)</label>
-                                    <input type="number" id="costo_unitario" class="form-control" step="0.01" placeholder="Solo referencia">
+                                    <input type="number" id="costo_unitario" class="form-control" 
+                                           min="0" step="0.01" placeholder="0.00">
                                 </div>
                                 <div class="col-md-2 d-flex align-items-end">
                                     <button type="button" id="btnAddItem" class="btn btn-success w-100"><i class="fa-solid fa-plus"></i></button>

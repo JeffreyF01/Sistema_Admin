@@ -62,8 +62,11 @@ include "includes/sidebar.php";
                                 <div class="row mb-4">
                                     <div class="col-md-8">
                                         <label class="form-label text-required">Nombre del Departamento</label>
-                                        <input type="text" name="nombre" id="nombre" class="form-control form-control-custom" required 
-                                               placeholder="Ej: Ventas, Tecnología, Administración">
+                                        <input type="text" name="nombre" id="nombre" class="form-control form-control-custom" 
+                                               pattern="[A-Za-z0-9ÁÉÍÓÚáéíóúÑñ\s]+" 
+                                               title="Solo letras, números y espacios" 
+                                               maxlength="80" 
+                                               placeholder="Ej: Ventas, Tecnología, Administración" required>
                                     </div>
                                     
                                     <div class="col-md-4">

@@ -48,27 +48,41 @@ include "includes/sidebar.php";
 
                                 <div class="row mb-3">
                                     <div class="col-md-6">
-                                        <label class="form-label">Nombre</label>
-                                        <input type="text" name="nombre" id="nombre" class="form-control" required>
+                                        <label class="form-label">Nombre <span class="text-danger">*</span></label>
+                                        <input type="text" name="nombre" id="nombre" class="form-control" 
+                                               maxlength="160" 
+                                               placeholder="Nombre de la empresa" required>
                                     </div>
                                     <div class="col-md-6">
-                                        <label class="form-label">RNC</label>
-                                        <input type="text" name="rnc" id="rnc" class="form-control" required>
+                                        <label class="form-label">RNC <span class="text-danger">*</span></label>
+                                        <input type="text" name="rnc" id="rnc" class="form-control" 
+                                               pattern="[0-9\-]+" 
+                                               title="Solo números y guiones" 
+                                               maxlength="30" 
+                                               placeholder="000-0000000-0" required>
                                     </div>
                                 </div>
 
                                 <div class="row mb-3">
                                     <div class="col-md-6">
-                                        <label class="form-label">Dirección</label>
-                                        <input type="text" name="direccion" id="direccion" class="form-control" required>
+                                        <label class="form-label">Dirección <span class="text-danger">*</span></label>
+                                        <input type="text" name="direccion" id="direccion" class="form-control" 
+                                               maxlength="255" 
+                                               placeholder="Calle, número, ciudad" required>
                                     </div>
                                     <div class="col-md-3">
-                                        <label class="form-label">Teléfono</label>
-                                        <input type="text" name="telefono" id="telefono" class="form-control" required>
+                                        <label class="form-label">Teléfono <span class="text-danger">*</span></label>
+                                        <input type="text" name="telefono" id="telefono" class="form-control" 
+                                               pattern="[0-9\-\+\(\)\s]+" 
+                                               title="Solo números, espacios, guiones, paréntesis" 
+                                               maxlength="40" 
+                                               placeholder="(809) 555-1234" required>
                                     </div>
                                     <div class="col-md-3">
-                                        <label class="form-label">Email</label>
-                                        <input type="email" name="email" id="email" class="form-control" required>
+                                        <label class="form-label">Email <span class="text-danger">*</span></label>
+                                        <input type="email" name="email" id="email" class="form-control" 
+                                               maxlength="120" 
+                                               placeholder="empresa@correo.com" required>
                                     </div>
                                 </div>
 

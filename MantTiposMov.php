@@ -61,8 +61,9 @@ include "includes/sidebar.php";
                                 <div class="row">
                                     <div class="col-md-6 mb-4">
                                         <label class="form-label text-required">Nombre del Movimiento</label>
-                                        <input type="text" name="nombre" id="nombre" class="form-control form-control-custom" required 
-                                               placeholder="Ej: Entrada por Compra, Salida por Venta">
+                                        <input type="text" name="nombre" id="nombre" class="form-control form-control-custom" 
+                                               maxlength="80" 
+                                               placeholder="Ej: Entrada por Compra, Salida por Venta" required>
                                     </div>
 
                                     <div class="col-md-6 mb-4">
@@ -77,7 +78,8 @@ include "includes/sidebar.php";
 
                                 <div class="mb-4">
                                     <label class="form-label">Descripción</label>
-                                    <textarea name="descripcion" id="descripcion" class="form-control form-control-custom" rows="3"
+                                    <textarea name="descripcion" id="descripcion" class="form-control form-control-custom" rows="3" 
+                                              maxlength="255" 
                                               placeholder="Descripción detallada del tipo de movimiento..."></textarea>
                                 </div>
 

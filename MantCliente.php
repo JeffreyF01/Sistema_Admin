@@ -47,29 +47,44 @@ include "includes/sidebar.php";
 
                                 <div class="row mb-3">
                                     <div class="col-md-6">
-                                        <label class="form-label">Nombre</label>
-                                        <input type="text" name="nombre" id="nombre" class="form-control" required>
+                                        <label class="form-label">Nombre <span class="text-danger">*</span></label>
+                                        <input type="text" name="nombre" id="nombre" class="form-control" 
+                                               pattern="[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+" 
+                                               title="Solo letras y espacios" 
+                                               maxlength="160" required>
                                     </div>
                                     <div class="col-md-6">
                                         <label class="form-label">Documento (Cédula / RNC)</label>
-                                        <input type="text" name="doc_identidad" id="doc_identidad" class="form-control">
+                                        <input type="text" name="doc_identidad" id="doc_identidad" class="form-control" 
+                                               pattern="[0-9\-]+" 
+                                               title="Solo números y guiones" 
+                                               maxlength="40" 
+                                               placeholder="000-0000000-0">
                                     </div>
                                 </div>
 
                                 <div class="row mb-3">
                                     <div class="col-md-6">
                                         <label class="form-label">Email</label>
-                                        <input type="email" name="email" id="email" class="form-control">
+                                        <input type="email" name="email" id="email" class="form-control" 
+                                               maxlength="120" 
+                                               placeholder="ejemplo@correo.com">
                                     </div>
                                     <div class="col-md-6">
                                         <label class="form-label">Teléfono</label>
-                                        <input type="text" name="telefono" id="telefono" class="form-control">
+                                        <input type="text" name="telefono" id="telefono" class="form-control" 
+                                               pattern="[0-9\-\+\(\)\s]+" 
+                                               title="Solo números, espacios, guiones, paréntesis" 
+                                               maxlength="40" 
+                                               placeholder="(809) 555-1234">
                                     </div>
                                 </div>
 
                                 <div class="mb-3">
                                     <label class="form-label">Dirección</label>
-                                    <input type="text" name="direccion" id="direccion" class="form-control">
+                                    <input type="text" name="direccion" id="direccion" class="form-control" 
+                                           maxlength="255" 
+                                           placeholder="Calle, número, ciudad">
                                 </div>
 
                                 <div class="mb-3">

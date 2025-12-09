@@ -47,16 +47,27 @@ include "includes/sidebar.php";
 
                                 <div class="row mb-3">
                                     <div class="col-md-6">
-                                        <label class="form-label">Nombre</label>
-                                        <input type="text" name="nombre" id="nombre" class="form-control" required>
+                                        <label class="form-label">Nombre <span class="text-danger">*</span></label>
+                                        <input type="text" name="nombre" id="nombre" class="form-control" 
+                                               pattern="[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+" 
+                                               title="Solo letras y espacios" 
+                                               maxlength="100" 
+                                               placeholder="Nombre completo" required>
                                     </div>
                                     <div class="col-md-3">
-                                        <label class="form-label">Usuario</label>
-                                        <input type="text" name="usuario" id="usuario" class="form-control" required>
+                                        <label class="form-label">Usuario <span class="text-danger">*</span></label>
+                                        <input type="text" name="usuario" id="usuario" class="form-control" 
+                                               pattern="[A-Za-z0-9_]+" 
+                                               title="Solo letras, números y guion bajo" 
+                                               maxlength="50" 
+                                               placeholder="nombre_usuario" required>
                                     </div>
                                     <div class="col-md-3">
-                                        <label class="form-label">Clave</label>
-                                        <input type="password" name="clave" id="clave" class="form-control" required>
+                                        <label class="form-label">Clave <span class="text-danger">*</span></label>
+                                        <input type="password" name="clave" id="clave" class="form-control" 
+                                               minlength="6" 
+                                               title="Mínimo 6 caracteres" 
+                                               placeholder="Mínimo 6 caracteres" required>
                                     </div>
                                 </div>
 

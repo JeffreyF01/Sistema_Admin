@@ -112,11 +112,13 @@ include '../includes/sidebar.php';
                                 </div>
                                 <div class="col-md-2">
                                     <label>Cantidad</label>
-                                    <input type="number" id="cantidad" class="form-control" min="0.01" step="0.01" value="1">
+                                    <input type="number" id="cantidad" class="form-control" 
+                                           min="0.01" step="0.01" value="1" placeholder="1.00">
                                 </div>
                                 <div class="col-md-2">
                                     <label>Costo unit.</label>
-                                    <input type="number" id="costo_unitario" class="form-control" readonly>
+                                    <input type="number" id="costo_unitario" class="form-control" 
+                                           min="0" step="0.01" placeholder="0.00" readonly>
                                 </div>
                                 <div class="col-md-2">
                                     <label>Subtotal</label>
@@ -340,6 +342,17 @@ $(function(){
         if(detalle.length === 0){ Swal.fire('Error','Agregue al menos un item','error'); return; }
         if(!$('#proveedor_id').val()){ Swal.fire('Error','Seleccione proveedor','error'); return; }
         if(!$('#fecha').val()){ Swal.fire('Error','Seleccione fecha','error'); return; }
+        
+        // Validar cantidades positivas
+        let errorCantidad = false;
+        detalle.forEach(function(item){
+            if(!Validaciones.validarPositivo(item.cantidad)){
+                Swal.fire('Error', 'Todas las cantidades deben ser mayores a 0', 'error');
+                errorCantidad = true;
+                return false;
+            }
+        });
+        if(errorCantidad) return;
 
         const payload = {
             accion: $('#accion').val(),
