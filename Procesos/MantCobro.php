@@ -17,7 +17,7 @@ $usuario_id = $_SESSION['user_info']['id_usuarios'] ?? '';
             <div class="row align-items-center">
                 <div class="col">
                     <h4 class="page-title"><i class="fa-solid fa-hand-holding-dollar me-2"></i>Cobros</h4>
-                    <p class="page-subtitle">Registrar cobros de clientes — aplicar a una o varias facturas</p>
+                    <p class="page-subtitle">Registrar cobros de clientes</p>
                 </div>
                 <div class="col-auto">
                     <div class="user-info">
@@ -119,7 +119,7 @@ $usuario_id = $_SESSION['user_info']['id_usuarios'] ?? '';
                                     <button type="button" id="btnDistribuir" class="btn btn-outline-primary w-100">Distribuir automáticamente</button>
                                 </div>
                                 <div class="col-md-6">
-                                    <small class="text-muted">Indica un monto total y distribúyelo entre facturas, o ingresa montos manuales.</small>
+                                    <small class="text-muted"></small>
                                 </div>
                             </div>
 

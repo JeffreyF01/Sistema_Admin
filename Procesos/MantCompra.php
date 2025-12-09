@@ -14,7 +14,7 @@ include '../includes/sidebar.php';
             <div class="row align-items-center">
                 <div class="col">
                     <h4 class="page-title"><i class="fa-solid fa-truck me-2"></i>Compras</h4>
-                    <p class="page-subtitle">Registrar compras de proveedores — aumenta inventario y genera CxP</p>
+                    <p class="page-subtitle">Registrar compras de proveedores</p>
                 </div>
                 <div class="col-auto">
                     <div class="user-info">
@@ -113,7 +113,7 @@ include '../includes/sidebar.php';
                                 <div class="col-md-2">
                                     <label>Cantidad</label>
                                     <input type="number" id="cantidad" class="form-control" 
-                                           min="0.01" step="0.01" value="1" placeholder="1.00">
+                                           min="1" step="1" value="1" placeholder="1">
                                 </div>
                                 <div class="col-md-2">
                                     <label>Costo unit.</label>
@@ -247,7 +247,7 @@ $(function(){
                 productos = res.data;
                 let opts = '<option value="">Seleccione un producto...</option>';
                 res.data.forEach(function(p){
-                    opts += `<option value="${p.id_productos}" data-costo="${p.costo || 0}">${p.nombre} - Stock: ${parseFloat(p.stock||0)}</option>`;
+                    opts += `<option value="${p.id_productos}" data-costo="${p.costo || 0}">${p.nombre} - Stock: ${parseInt(p.stock||0)}</option>`;
                 });
                 $('#producto_id').html(opts);
             }
@@ -322,13 +322,39 @@ $(function(){
                 <td>${it.cantidad}</td>
                 <td>$${parseFloat(it.costo_unitario).toFixed(2)}</td>
                 <td>$${parseFloat(it.subtotal).toFixed(2)}</td>
-                <td><button class="btn btn-sm btn-danger" onclick="removeItemCompra(${idx})"><i class="fa-solid fa-trash"></i></button></td>
+                <td>
+                    <div class="btn-group btn-group-sm" role="group">
+                        <button type="button" class="btn btn-outline-primary" onclick="decrementarItemCompra(${idx})" title="Disminuir cantidad">
+                            <i class="fa-solid fa-minus"></i>
+                        </button>
+                        <button type="button" class="btn btn-outline-success" onclick="incrementarItemCompra(${idx})" title="Aumentar cantidad">
+                            <i class="fa-solid fa-plus"></i>
+                        </button>
+                        <button type="button" class="btn btn-outline-danger" onclick="removeItemCompra(${idx})" title="Eliminar producto">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </div>
+                </td>
             </tr>`;
         });
 
         $('#detalleCompraTable tbody').html(html || '<tr><td colspan="5" class="text-center">No hay items</td></tr>');
         $('#totalCompra').text('$' + total.toFixed(2));
     }
+
+    window.incrementarItemCompra = function(index) {
+        detalle[index].cantidad++;
+        detalle[index].subtotal = detalle[index].cantidad * detalle[index].costo_unitario;
+        actualizarDetalle();
+    };
+
+    window.decrementarItemCompra = function(index) {
+        if (detalle[index].cantidad > 1) {
+            detalle[index].cantidad--;
+            detalle[index].subtotal = detalle[index].cantidad * detalle[index].costo_unitario;
+            actualizarDetalle();
+        }
+    };
 
     window.removeItemCompra = function(i){
         detalle.splice(i,1);

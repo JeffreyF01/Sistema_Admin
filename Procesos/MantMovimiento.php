@@ -52,8 +52,6 @@ include '../includes/sidebar.php';
                                     <th>Tipo</th>
                                     <th>Clase</th>
                                     <th>Fecha</th>
-                                    <th>Líneas</th>
-                                    <th>Total Cant.</th>
                                     <th>Referencia</th>
                                     <th>Acciones</th>
                                 </tr>
@@ -117,17 +115,12 @@ include '../includes/sidebar.php';
                                         <option value="">Seleccione...</option>
                                     </select>
                                 </div>
-                                <div class="col-md-2">
+                                <div class="col-md-4">
                                     <label>Cantidad</label>
                                     <input type="number" id="cantidad" class="form-control" 
-                                           min="0.01" step="0.01" value="1" placeholder="1.00">
+                                           min="1" step="1" value="1" placeholder="1">
                                 </div>
-                                <div class="col-md-3">
-                                    <label>Costo unit. (opcional)</label>
-                                    <input type="number" id="costo_unitario" class="form-control" 
-                                           min="0" step="0.01" placeholder="0.00">
-                                </div>
-                                <div class="col-md-2 d-flex align-items-end">
+                                <div class="col-md-3 d-flex align-items-end">
                                     <button type="button" id="btnAddItem" class="btn btn-success w-100"><i class="fa-solid fa-plus"></i></button>
                                 </div>
                             </div>
@@ -139,7 +132,6 @@ include '../includes/sidebar.php';
                                             <th>Producto</th>
                                             <th>SKU</th>
                                             <th>Cantidad</th>
-                                            <th>Costo</th>
                                             <th>Acción</th>
                                         </tr>
                                     </thead>
@@ -194,8 +186,6 @@ $(function(){
                         <td>${m.tipo_nombre}</td>
                         <td>${badge}</td>
                         <td>${m.fecha}</td>
-                        <td>${m.lineas}</td>
-                        <td>${parseFloat(m.total_cantidad).toFixed(2)}</td>
                         <td>${m.referencia || ''}</td>
                         <td class="d-flex gap-1">
                             <button class="btn btn-sm btn-primary" title="Ver detalle" onclick="verMovimiento('${m.numero_documento}')"><i class="fa-solid fa-eye"></i></button>
@@ -204,7 +194,7 @@ $(function(){
                     </tr>`;
                 });
             }
-            $('#movTable tbody').html(html || '<tr><td colspan="8" class="text-center">Sin movimientos</td></tr>');
+            $('#movTable tbody').html(html || '<tr><td colspan="6" class="text-center">Sin movimientos</td></tr>');
         }, 'json');
     }
 
@@ -223,7 +213,7 @@ $(function(){
             if(res.success){
                 productos = res.data;
                 let opts = '<option value="">Seleccione...</option>';
-                res.data.forEach(function(p){ opts += `<option value="${p.id_productos}" data-stock="${p.stock}" data-sku="${p.sku}" data-costo="${p.costo}">${p.nombre} — Stock: ${parseFloat(p.stock).toFixed(2)}</option>`; });
+                res.data.forEach(function(p){ opts += `<option value="${p.id_productos}" data-stock="${p.stock}" data-sku="${p.sku}" data-costo="${p.costo}">${p.nombre} — Stock: ${parseInt(p.stock)||0}</option>`; });
                 $('#producto_id').html(opts);
             }
         }, 'json');
@@ -244,7 +234,6 @@ $(function(){
     $('#btnAddItem').click(function(){
         const prodId = $('#producto_id').val();
         const cantidad = parseFloat($('#cantidad').val()) || 0;
-        const costo = $('#costo_unitario').val() === '' ? null : parseFloat($('#costo_unitario').val());
         if(!prodId){ Swal.fire('Error','Seleccione un producto','error'); return; }
         if(cantidad <= 0){ Swal.fire('Error','Cantidad inválida','error'); return; }
 
@@ -261,43 +250,62 @@ $(function(){
         const existente = detalle.find(d => d.producto_id == prodId);
         if(existente){
             existente.cantidad += cantidad;
-            if(costo !== null) existente.costo_unitario = costo;
         } else {
             detalle.push({
                 producto_id: prodId,
                 nombre: prod.nombre,
                 sku: prod.sku,
                 cantidad: cantidad,
-                costo_unitario: costo,
                 stock: prod.stock
             });
         }
 
         $('#producto_id').val('');
         $('#cantidad').val('1');
-        $('#costo_unitario').val('');
         renderDetalle();
     });
 
     function renderDetalle(){
         if(detalle.length === 0){
-            $('#detalleTable tbody').html('<tr><td colspan="5" class="text-center">Sin ítems</td></tr>');
+            $('#detalleTable tbody').html('<tr><td colspan="4" class="text-center">Sin ítems</td></tr>');
             return;
         }
 
         let html = '';
         detalle.forEach((d, idx) => {
-            const costoTxt = d.costo_unitario !== null && d.costo_unitario !== undefined ? `$${parseFloat(d.costo_unitario).toFixed(2)}` : '-';
             html += `<tr>
                 <td>${d.nombre}</td>
                 <td>${d.sku || ''}</td>
                 <td>${parseFloat(d.cantidad).toFixed(2)}</td>
-                <td>${costoTxt}</td>
-                <td><button class="btn btn-sm btn-danger" onclick="removeItem(${idx})"><i class="fa-solid fa-trash"></i></button></td>
+                <td>
+                    <div class="btn-group btn-group-sm" role="group">
+                        <button type="button" class="btn btn-outline-primary" onclick="decrementarItemMov(${idx})" title="Disminuir cantidad">
+                            <i class="fa-solid fa-minus"></i>
+                        </button>
+                        <button type="button" class="btn btn-outline-success" onclick="incrementarItemMov(${idx})" title="Aumentar cantidad">
+                            <i class="fa-solid fa-plus"></i>
+                        </button>
+                        <button type="button" class="btn btn-outline-danger" onclick="removeItem(${idx})" title="Eliminar producto">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </div>
+                </td>
             </tr>`;
         });
         $('#detalleTable tbody').html(html);
     }
+
+    window.incrementarItemMov = function(index) {
+        detalle[index].cantidad++;
+        renderDetalle();
+    };
+
+    window.decrementarItemMov = function(index) {
+        if (detalle[index].cantidad > 1) {
+            detalle[index].cantidad--;
+            renderDetalle();
+        }
+    };
 
     window.removeItem = function(i){
         detalle.splice(i,1);

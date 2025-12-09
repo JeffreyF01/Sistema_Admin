@@ -14,7 +14,7 @@ include '../includes/sidebar.php';
             <div class="row align-items-center">
                 <div class="col">
                     <h4 class="page-title"><i class="fa-solid fa-file-signature me-2"></i>Cotizaciones</h4>
-                    <p class="page-subtitle">Crear y gestionar cotizaciones (no afecta inventario)</p>
+                    <p class="page-subtitle">Crear y gestionar cotizaciones</p>
                 </div>
                 <div class="col-auto">
                     <div class="user-info">
@@ -114,7 +114,7 @@ include '../includes/sidebar.php';
                                 </div>
                                 <div class="col-md-2">
                                     <label>Cantidad</label>
-                                    <input type="number" id="cantidad" class="form-control" min="0.01" step="0.01" value="1">
+                                    <input type="number" id="cantidad" class="form-control" min="1" step="1" value="1">
                                 </div>
                                 <div class="col-md-2">
                                     <label>Precio unit.</label>
@@ -325,7 +325,7 @@ $(function(){
                 productos = res.data;
                 let opts = '<option value="">Seleccione un producto...</option>';
                 res.data.forEach(function(p){
-                    opts += `<option value="${p.id_productos}" data-precio="${p.precio_venta}">${p.nombre} - $${parseFloat(p.precio_venta).toFixed(2)}</option>`;
+                    opts += `<option value="${p.id_productos}" data-precio="${p.precio_venta}">${p.nombre} - Stock: ${parseInt(p.stock)||0} - $${parseFloat(p.precio_venta).toFixed(2)}</option>`;
                 });
                 $('#producto_id').html(opts);
             }

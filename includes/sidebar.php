@@ -19,6 +19,7 @@ $procesoPages = [
     'MantCompra.php',
     'MantMovimiento.php',
     'MantPago.php',
+    'MantCobro.php',
     'MantDevolucion.php'
 ];
 $consultaPages = [
@@ -148,18 +149,6 @@ function nav_link($url, $icon, $label, $allowed, $isActive = false) {
                 echo nav_link($baseUrl.'Consultas/Consulta_proveedor.php', 'fa-solid fa-truck', 'Proveedores', $allowConsultas, $current === 'Consulta_proveedor.php');
                 ?>
             </div>
-        </div>
-
-        <div class="sidebar-item">
-            <?php
-            // Reportes -> inv_reportes permiso
-            $allowReportes = ($perms['inv_reportes'] ?? 0);
-            if ($allowReportes) {
-                echo '<a href="#" class="sidebar-link"><i class="fa-solid fa-chart-pie"></i><span>Reportes</span></a>';
-            } else {
-                echo '<a href="#" class="sidebar-link" style="opacity:0.45;pointer-events:none;cursor:not-allowed;" title="Acceso denegado"><i class="fa-solid fa-chart-pie"></i><span>Reportes</span></a>';
-            }
-            ?>
         </div>
 
         <div class="sidebar-item">

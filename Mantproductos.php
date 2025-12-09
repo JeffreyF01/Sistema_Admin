@@ -111,11 +111,11 @@ include "includes/sidebar.php";
                                     </div>
                                     <div class="col-md-3">
                                         <label class="form-label">Stock <span class="text-danger">*</span></label>
-                                        <input type="number" step="0.01" min="0" name="stock" id="stock" class="form-control" required>
+                                        <input type="number" step="1" min="0" name="stock" id="stock" class="form-control" required>
                                     </div>
                                     <div class="col-md-3">
                                         <label class="form-label">Stock Mín. <span class="text-danger">*</span></label>
-                                        <input type="number" step="0.01" min="0" name="stock_min" id="stock_min" class="form-control" required>
+                                        <input type="number" step="1" min="0" name="stock_min" id="stock_min" class="form-control" required>
                                     </div>
                                     <div class="col-md-3">
                                         <label class="form-label">Estado</label>
@@ -216,10 +216,10 @@ $(document).on("click", ".btn-editar", function(){
     $("#grupo_id").val($(this).data("grupo"));
     $("#ubicacion_id").val($(this).data("ubicacion"));
     $("#unidad").val($(this).data("unidad"));
-    $("#precio_venta").val($(this).data("precio"));
-    $("#costo").val($(this).data("costo"));
-    $("#stock").val($(this).data("stock"));
-    $("#stock_min").val($(this).data("stockmin"));
+    $("#precio_venta").val(parseFloat($(this).data("precio")).toFixed(2));
+    $("#costo").val(parseFloat($(this).data("costo")).toFixed(2));
+    $("#stock").val(parseInt($(this).data("stock")));
+    $("#stock_min").val(parseInt($(this).data("stockmin")));
     $("#activo").val($(this).data("activo"));
 
     let modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('modalProducto'));

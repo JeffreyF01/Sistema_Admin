@@ -486,7 +486,7 @@ $(document).ready(function() {
                     productosList = response.data;
                     let options = '<option value="">Seleccione un producto...</option>';
                     response.data.forEach(function(producto) {
-                        const stock = parseFloat(producto.stock) || 0;
+                        const stock = parseInt(producto.stock) || 0;
                         const precio = parseFloat(producto.precio_venta) || 0;
                         options += `<option value="${producto.id_productos}" data-precio="${precio}" data-stock="${stock}">
                             ${producto.nombre} - Stock: ${stock} - $${precio.toFixed(2)}

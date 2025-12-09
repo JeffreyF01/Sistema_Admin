@@ -19,7 +19,7 @@ include 'includes/sidebar.php';
                     <h4 class="page-title">
                         <i class="fa-solid fa-file-invoice-dollar me-2"></i>Cuentas por Cobrar (CxC)
                     </h4>
-                    <p class="page-subtitle">Administración de clientes, cobros y reportes financieros</p>
+                    <p class="page-subtitle">Administración de clientes y cobros</p>
                 </div>
                 <div class="col-auto d-flex align-items-center gap-3">
                     <div class="user-info">
@@ -48,44 +48,10 @@ include 'includes/sidebar.php';
 
             <!-- PROCESOS -->
             <div class="col-md-3">
-                <a href="MantCobro.php" class="card-dashboard">
+                <a href="Procesos/MantCobro.php" class="card-dashboard">
                     <i class="fa-solid fa-money-bill-transfer"></i>
                     <h5>Cobro</h5>
                     <p>Registro de pagos y transacciones</p>
-                </a>
-            </div>
-
-            <!-- CONSULTAS -->
-            <div class="col-md-3">
-                <a href="#" class="card-dashboard">
-                    <i class="fa-solid fa-magnifying-glass"></i>
-                    <h5>Consulta Clientes</h5>
-                    <p>Búsqueda y verificación de información</p>
-                </a>
-            </div>
-
-            <div class="col-md-3">
-                <a href="#" class="card-dashboard">
-                    <i class="fa-solid fa-list-check"></i>
-                    <h5>Consulta Cobros</h5>
-                    <p>Historial y detalles de cobros</p>
-                </a>
-            </div>
-
-            <!-- REPORTES -->
-            <div class="col-md-3">
-                <a href="#" class="card-dashboard">
-                    <i class="fa-solid fa-chart-column"></i>
-                    <h5>Reporte de Clientes</h5>
-                    <p>Análisis y listado general</p>
-                </a>
-            </div>
-
-            <div class="col-md-3">
-                <a href="#" class="card-dashboard">
-                    <i class="fa-solid fa-file-lines"></i>
-                    <h5>Reporte de Cobros</h5>
-                    <p>Resumen de pagos recibidos</p>
                 </a>
             </div>
 

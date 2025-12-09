@@ -50,7 +50,7 @@ if ($accion === 'listar_clientes') {
 }
 
 if ($accion === 'listar_productos') {
-    $sql = "SELECT id_productos, nombre, precio_venta FROM producto WHERE activo = 1 ORDER BY nombre";
+    $sql = "SELECT id_productos, nombre, stock, precio_venta FROM producto WHERE activo = 1 ORDER BY nombre";
     $res = $conexion->query($sql);
     $out = [];
     while ($r = $res->fetch_assoc()) $out[] = $r;
