@@ -53,7 +53,6 @@ $usuario_id = $_SESSION['user_info']['id_usuarios'] ?? '';
                                     <th>N° Cobro</th>
                                     <th>Cliente</th>
                                     <th>Fecha</th>
-                                    <th>Monto</th>
                                     <th>Usuario</th>
                                     <th>Estado</th>
                                     <th>Acciones</th>
@@ -191,7 +190,6 @@ $(function(){
                                 <td>${c.numero_documento}</td>
                                 <td>${c.cliente_nombre || ''}</td>
                                 <td>${c.fecha}</td>
-                                <td>$${parseFloat(c.monto).toFixed(2)}</td>
                                 <td>${c.usuario_nombre || ''}</td>
                                 <td>${estado}</td>
                                 <td>
