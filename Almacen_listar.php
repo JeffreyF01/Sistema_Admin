@@ -1,7 +1,7 @@
 <?php
 include("conexion.php");
 
-$result = $conexion->query("SELECT * FROM almacen ORDER BY id_almacen DESC");
+$result = $conexion->query("SELECT * FROM almacen ORDER BY id_almacen ASC");
 
 while($row = $result->fetch_assoc()){ 
     $estado = $row['activo'] 

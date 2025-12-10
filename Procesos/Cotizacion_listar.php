@@ -44,12 +44,12 @@ $sql = "SELECT c.id_cotizaciones, c.numero_documento, cli.nombre AS cliente_nomb
                DATE_FORMAT(c.fecha,'%Y-%m-%d') AS fecha, DATE_FORMAT(c.valida_hasta,'%Y-%m-%d') AS valida_hasta,
                c.total, c.activo
         FROM cotizacion c LEFT JOIN cliente cli ON cli.id_clientes = c.cliente_id
-        ORDER BY c.id_cotizaciones DESC";
+        ORDER BY c.id_cotizaciones ASC";
 $res = $conexion->query($sql);
 if($res->num_rows > 0){
     while($r = $res->fetch_assoc()){
-        $estado = $r['activo']==1 ? "<span style='background-color:#d1e7dd;color:#0f5132;padding:6px 12px;border-radius:20px;font-weight:500;'><i class='fas fa-circle me-1' style='font-size:8px;color:#198754;'></i>Activo</span>"
-        : "<span style='background-color:#f8d7da;color:#842029;padding:6px 12px;border-radius:20px;font-weight:500;'><i class='fas fa-circle me-1' style='font-size:8px;color:#dc3545;'></i>Anulado</span>";
+        $estado = $r['activo']==1 ? "<span style='background-color:#d1e7dd;color:#0f5132;padding:4px 8px;border-radius:12px;font-weight:500;font-size:12px;white-space:nowrap;'><i class='fas fa-circle me-1' style='font-size:6px;color:#198754;'></i>Activo</span>"
+        : "<span style='background-color:#f8d7da;color:#842029;padding:4px 8px;border-radius:12px;font-weight:500;font-size:12px;white-space:nowrap;'><i class='fas fa-circle me-1' style='font-size:6px;color:#dc3545;'></i>Anulado</span>";
         echo "<tr>
             <td>{$r['id_cotizaciones']}</td>
             <td>{$r['numero_documento']}</td>

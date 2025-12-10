@@ -1,7 +1,7 @@
 <?php
 require "conexion.php";
 
-$sql = "SELECT id_clientes, nombre, doc_identidad, email, telefono, direccion, activo FROM cliente ORDER BY id_clientes DESC";
+$sql = "SELECT id_clientes, nombre, doc_identidad, email, telefono, direccion, activo FROM cliente ORDER BY id_clientes ASC";
 $res = $conexion->query($sql);
 
 if(!$res){

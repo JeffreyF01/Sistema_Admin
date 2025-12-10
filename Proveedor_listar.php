@@ -2,7 +2,7 @@
 require "conexion.php";
 
 $sql = "SELECT id_proveedores, nombre, rnc, email, telefono, direccion, activo 
-        FROM proveedor ORDER BY id_proveedores DESC";
+        FROM proveedor ORDER BY id_proveedores ASC";
 $res = $conexion->query($sql);
 
 if(!$res){
@@ -14,8 +14,8 @@ while($row = $res->fetch_assoc()){
     $id = (int)$row['id_proveedores'];
 
     $estado = $row['activo'] 
-        ? "<span style='background-color:#d1e7dd;color:#0f5132;padding:6px 12px;border-radius:20px;font-weight:500;'><i class='fas fa-circle me-1' style='font-size:8px;color:#198754;'></i>Activo</span>"
-        : "<span style='background-color:#f8d7da;color:#842029;padding:6px 12px;border-radius:20px;font-weight:500;'><i class='fas fa-circle me-1' style='font-size:8px;color:#dc3545;'></i>Inactivo</span>";
+        ? "<span style='background-color:#d1e7dd;color:#0f5132;padding:4px 8px;border-radius:12px;font-weight:500;font-size:12px;white-space:nowrap;'><i class='fas fa-circle me-1' style='font-size:6px;color:#198754;'></i>Activo</span>"
+        : "<span style='background-color:#f8d7da;color:#842029;padding:4px 8px;border-radius:12px;font-weight:500;font-size:12px;white-space:nowrap;'><i class='fas fa-circle me-1' style='font-size:6px;color:#dc3545;'></i>Inactivo</span>";
 
     echo "
     <tr>

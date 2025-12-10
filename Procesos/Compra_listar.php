@@ -45,7 +45,7 @@ include '../includes/sidebar.php';
               </thead>
               <tbody>
               <?php
-                $q = "SELECT c.*, p.nombre as proveedor_nombre FROM compra c LEFT JOIN proveedor p ON c.proveedor_id = p.id_proveedores ORDER BY c.fecha DESC";
+                $q = "SELECT c.*, p.nombre as proveedor_nombre FROM compra c LEFT JOIN proveedor p ON c.proveedor_id = p.id_proveedores ORDER BY c.fecha ASC";
                 $res = $conexion->query($q);
                 if($res && $res->num_rows>0){
                     while($r = $res->fetch_assoc()){

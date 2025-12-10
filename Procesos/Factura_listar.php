@@ -107,21 +107,19 @@ include '../includes/sidebar.php';
                                           INNER JOIN cliente c ON f.cliente_id = c.id_clientes
                                           INNER JOIN condicion_pago cp ON f.condicion_id = cp.id_condiciones_pago
                                           INNER JOIN usuario u ON f.usuario_id = u.id_usuarios
-                                          ORDER BY f.fecha DESC, f.id_facturas DESC";
+                                          ORDER BY f.fecha ASC, f.id_facturas ASC";
                                 
                                 $result = $conexion->query($query);
                                 
                                 if ($result && $result->num_rows > 0) {
                                     while ($row = $result->fetch_assoc()) {
                                         $estadoBadge = $row['activo'] == 1
-                                            ? "<span style='background-color:#d1e7dd;color:#0f5132;padding:6px 12px;border-radius:20px;font-weight:500;'>
-                                                 <i class='fas fa-circle me-1' style='font-size:8px;color:#198754;'></i>Activo
-                                               </span>"
-                                            : "<span style='background-color:#f8d7da;color:#842029;padding:6px 12px;border-radius:20px;font-weight:500;'>
-                                                 <i class='fas fa-circle me-1' style='font-size:8px;color:#dc3545;'></i>Anulado
-                                               </span>";
-                                        
-                                        echo "<tr data-activo='{$row['activo']}' data-cliente='" . htmlspecialchars($row['cliente_nombre']) . "' data-numero='" . htmlspecialchars($row['numero_documento']) . "' data-fecha='" . htmlspecialchars($row['fecha']) . "'>";
+                                            ? "<span style='background-color:#d1e7dd;color:#0f5132;padding:4px 8px;border-radius:12px;font-weight:500;font-size:12px;white-space:nowrap;'>
+                                                <i class='fas fa-circle me-1' style='font-size:6px;color:#198754;'></i>Activo
+                                              </span>"
+                                            : "<span style='background-color:#f8d7da;color:#842029;padding:4px 8px;border-radius:12px;font-weight:500;font-size:12px;white-space:nowrap;'>
+                                                <i class='fas fa-circle me-1' style='font-size:6px;color:#dc3545;'></i>Anulado
+                                              </span>";                                        echo "<tr data-activo='{$row['activo']}' data-cliente='" . htmlspecialchars($row['cliente_nombre']) . "' data-numero='" . htmlspecialchars($row['numero_documento']) . "' data-fecha='" . htmlspecialchars($row['fecha']) . "'>";
                                         echo "<td><strong>" . htmlspecialchars($row['numero_documento']) . "</strong></td>";
                                         echo "<td>" . htmlspecialchars($row['cliente_nombre']) . "</td>";
                                         echo "<td>" . date('d/m/Y', strtotime($row['fecha'])) . "</td>";

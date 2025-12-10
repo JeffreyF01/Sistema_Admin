@@ -6,11 +6,11 @@ $result = mysqli_query($conexion, $sql);
 
 while($row = mysqli_fetch_assoc($result)){
     $estado = $row['activo'] 
-        ? "<span style='background-color:#d1e7dd;color:#0f5132;padding:6px 12px;border-radius:20px;font-weight:500;'>
-             <i class='fas fa-circle me-1' style='font-size:8px;color:#198754;'></i>Activo
+        ? "<span style='background-color:#d1e7dd;color:#0f5132;padding:4px 8px;border-radius:12px;font-weight:500;font-size:12px;white-space:nowrap;'>
+             <i class='fas fa-circle me-1' style='font-size:6px;color:#198754;'></i>Activo
            </span>"
-        : "<span style='background-color:#f8d7da;color:#842029;padding:6px 12px;border-radius:20px;font-weight:500;'>
-             <i class='fas fa-circle me-1' style='font-size:8px;color:#dc3545;'></i>Inactivo
+        : "<span style='background-color:#f8d7da;color:#842029;padding:4px 8px;border-radius:12px;font-weight:500;font-size:12px;white-space:nowrap;'>
+             <i class='fas fa-circle me-1' style='font-size:6px;color:#dc3545;'></i>Inactivo
            </span>";
     echo "
     <tr>

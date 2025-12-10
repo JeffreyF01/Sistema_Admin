@@ -43,7 +43,7 @@ include "../includes/sidebar.php";
                                 FROM pago p
                                 INNER JOIN proveedor pr ON pr.id_proveedores = p.proveedor_id
                                 INNER JOIN usuario u ON u.id_usuarios = p.usuario_id
-                                ORDER BY p.id_pagos DESC";
+                                ORDER BY p.id_pagos ASC";
 
                         $res = $conexion->query($sql);
 
