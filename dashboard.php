@@ -106,13 +106,6 @@ include 'includes/sidebar.php';
                     <p>Buscar y consultar información del sistema</p>
                 </a>
             </div>
-            <div class="col-md-3">
-                <div class="card-dashboard">
-                    <i class="fa-solid fa-chart-pie"></i>
-                    <h5>Reportes</h5>
-                    <p>Estadísticas, análisis y reportes detallados</p>
-                </div>
-            </div>
         </div>
 
         <div class="stats-section">
