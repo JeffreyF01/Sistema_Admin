@@ -93,11 +93,11 @@ include 'includes/sidebar.php';
                 </a>
             </div>
             <div class="col-md-3">
-                <div class="card-dashboard">
+                <a href="/Sistema_Admin/Procesos/MantFacturacion.php" class="card-dashboard">
                     <i class="fa-solid fa-gears"></i>
                     <h5>Procesos</h5>
                     <p>Operaciones y transacciones de negocio</p>
-                </div>
+                </a>
             </div>
             <div class="col-md-3">
                 <a href="/Sistema_Admin/Consultas/Consulta_departamento.php" class="card-dashboard">

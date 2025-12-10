@@ -38,7 +38,6 @@ $usuario_id = $_SESSION['user_info']['id_usuarios'] ?? '';
                 <button id="btnNuevoCobro" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#cobroModal">
                     <i class="fa-solid fa-plus me-2"></i>Nuevo Cobro
                 </button>
-                <a href="Cobro_listar.php" class="btn btn-secondary ms-2"><i class="fa-solid fa-list me-2"></i>Ver Cobros</a>
             </div>
 
             <div class="card card-custom fade-in">

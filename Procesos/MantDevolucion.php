@@ -39,9 +39,6 @@ include '../includes/sidebar.php';
                     <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#devolucionModal">
                         <i class="fa-solid fa-plus me-2"></i>Nueva Devolución
                     </button>
-                    <a href="Devolucion_listar.php" class="btn btn-secondary">
-                        <i class="fa-solid fa-list me-2"></i>Ver Todas las Devoluciones
-                    </a>
                 </div>
             </div>
 

@@ -38,7 +38,6 @@ include '../includes/sidebar.php';
                 <button id="btnNuevoPago" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#pagoModal">
                     <i class="fa-solid fa-plus me-2"></i>Nuevo Pago
                 </button>
-                <a href="Pago_listar.php" class="btn btn-secondary ms-2"><i class="fa-solid fa-list me-2"></i>Ver Pagos</a>
             </div>
 
             <div class="card card-custom fade-in">
@@ -204,7 +203,7 @@ $(function(){
                         <td>${p.fecha_pago}</td>
                         <td>$${parseFloat(p.monto).toFixed(2)}</td>
                         <td>${p.usuario}</td>
-                        <td><button class="btn btn-primary btn-sm" onclick="imprimirPago(${p.id_pago})"><i class="fa fa-print"></i></button></td>
+                        <td><button class="btn btn-primary btn-sm" onclick="imprimirPago(${p.id_pagos})"><i class="fa fa-print"></i></button></td>
                     </tr>`;
                 });
             }

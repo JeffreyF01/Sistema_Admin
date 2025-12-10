@@ -296,6 +296,17 @@ $(function(){
     }
 
     window.incrementarItemMov = function(index) {
+        if(claseActual === 'SALIDA'){
+            const item = detalle[index];
+            const prod = productos.find(p => p.id_productos == item.producto_id);
+            const yaUsado = detalle.filter(d => d.producto_id == item.producto_id).reduce((acc, cur) => acc + cur.cantidad, 0);
+            const disponible = parseFloat(prod.stock) - yaUsado;
+            
+            if(disponible < 1){
+                Swal.fire('Error', `Stock insuficiente. Disponible: ${parseFloat(prod.stock) - (yaUsado - item.cantidad)}`, 'error');
+                return;
+            }
+        }
         detalle[index].cantidad++;
         renderDetalle();
     };

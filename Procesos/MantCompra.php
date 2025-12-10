@@ -35,7 +35,6 @@ include '../includes/sidebar.php';
                 <button id="btnNuevaCompra" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#compraModal">
                     <i class="fa-solid fa-plus me-2"></i>Nueva Compra
                 </button>
-                <a href="Compra_listar.php" class="btn btn-secondary ms-2"><i class="fa-solid fa-list me-2"></i>Ver Compras</a>
             </div>
 
             <div class="card card-custom fade-in">
