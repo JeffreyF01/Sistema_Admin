@@ -328,7 +328,14 @@ $(document).ready(function() {
                         }
                     });
                     $('#devolucionModal').modal('hide');
+                    // Limpiar formulario
+                    $('#devolucionForm')[0].reset();
+                    detalleItems = [];
+                    $('#detalleTable tbody').html('');
+                    
+                    // Recargar tabla inmediatamente
                     cargarDevoluciones();
+                    cargarFacturas();
                 } else {
                     Swal.fire('Error', response.message, 'error');
                 }

@@ -45,9 +45,10 @@ try {
                         ),0)
                     ) AS pendiente
                 FROM factura f
+                INNER JOIN condicion_pago cp ON f.condicion_id = cp.id_condiciones_pago
                 WHERE f.cliente_id = ?
                   AND f.activo = 1
-                  AND f.condicion_id = 1   -- Crédito
+                  AND cp.dias_plazo > 0   -- Solo crédito (dias_plazo > 0)
                   AND (
                       f.total - IFNULL((
                           SELECT SUM(d.total)
