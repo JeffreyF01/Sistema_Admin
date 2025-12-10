@@ -83,11 +83,23 @@ function guardarFactura($conexion, $data, $usuario_id) {
             $total += $item['subtotal'];
         }
 
+        // Obtener días de plazo para determinar si es contado o crédito
+        $query_dias = "SELECT dias_plazo FROM condicion_pago WHERE id_condiciones_pago = ?";
+        $stmt_dias = $conexion->prepare($query_dias);
+        $stmt_dias->bind_param("i", $condicion_id);
+        $stmt_dias->execute();
+        $result_dias = $stmt_dias->get_result();
+        $row_dias = $result_dias->fetch_assoc();
+        $dias_plazo = intval($row_dias['dias_plazo'] ?? 1);
+
+        // Determinar estado: Si dias_plazo = 0 es Contado (finalizado), si > 0 es Crédito (pendiente)
+        $estado = ($dias_plazo == 0) ? 'finalizado' : 'pendiente';
+
         // Insertar factura
-        $query = "INSERT INTO factura (numero_documento, cliente_id, usuario_id, fecha, condicion_id, total, activo) 
-                  VALUES (?, ?, ?, ?, ?, ?, 1)";
+        $query = "INSERT INTO factura (numero_documento, cliente_id, usuario_id, fecha, condicion_id, total, estado, activo) 
+                  VALUES (?, ?, ?, ?, ?, ?, ?, 1)";
         $stmt = $conexion->prepare($query);
-        $stmt->bind_param("siisid", $numero_documento, $cliente_id, $usuario_id, $fecha, $condicion_id, $total);
+        $stmt->bind_param("siisids", $numero_documento, $cliente_id, $usuario_id, $fecha, $condicion_id, $total, $estado);
         
         if (!$stmt->execute()) {
             throw new Exception("Error al guardar la factura: " . $stmt->error);

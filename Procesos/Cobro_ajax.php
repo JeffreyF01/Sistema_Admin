@@ -28,8 +28,17 @@ try {
                     f.numero_documento,
                     DATE_FORMAT(f.fecha, '%Y-%m-%d') AS fecha,
                     f.total,
+                    IFNULL((
+                        SELECT SUM(d.total)
+                        FROM devolucion d
+                        WHERE d.factura_id = f.id_facturas AND d.activo = 1
+                    ),0) AS monto_devuelto,
                     (
                         f.total - IFNULL((
+                            SELECT SUM(d.total)
+                            FROM devolucion d
+                            WHERE d.factura_id = f.id_facturas AND d.activo = 1
+                        ),0) - IFNULL((
                             SELECT SUM(cd.monto_aplicado)
                             FROM cobro_detalle cd
                             WHERE cd.factura_id = f.id_facturas AND cd.activo = 1
@@ -41,6 +50,10 @@ try {
                   AND f.condicion_id = 1   -- Crédito
                   AND (
                       f.total - IFNULL((
+                          SELECT SUM(d.total)
+                          FROM devolucion d
+                          WHERE d.factura_id = f.id_facturas AND d.activo = 1
+                      ),0) - IFNULL((
                           SELECT SUM(cd.monto_aplicado)
                           FROM cobro_detalle cd
                           WHERE cd.factura_id = f.id_facturas AND cd.activo = 1
@@ -76,17 +89,15 @@ try {
     // GENERAR NÚMERO DE COBRO
     // ============================
     if ($accion === "generar_numero") {
-        $res = $conexion->query("SELECT numero_documento FROM cobro ORDER BY id_cobros DESC LIMIT 1");
+        // Obtener el número más alto de todos los cobros existentes
+        $res = $conexion->query("SELECT MAX(CAST(SUBSTRING(numero_documento, 5) AS UNSIGNED)) as max_num FROM cobro WHERE numero_documento LIKE 'COB-%'");
 
+        $n = 1;
         if ($res && $res->num_rows > 0) {
             $row = $res->fetch_assoc();
-
-            if (preg_match('/COB-(\d+)/', $row['numero_documento'], $m))
-                $n = intval($m[1]) + 1;
-            else
-                $n = 1;
-
-        } else $n = 1;
+            $max_num = intval($row['max_num'] ?? 0);
+            $n = $max_num + 1;
+        }
 
         $nuevo = "COB-" . str_pad($n, 8, "0", STR_PAD_LEFT);
 
@@ -139,16 +150,15 @@ try {
         $conexion->begin_transaction();
 
         try {
-            // generar número
-            $res = $conexion->query("SELECT numero_documento FROM cobro ORDER BY id_cobros DESC LIMIT 1");
+            // generar número - obtener el número más alto de todos los cobros existentes
+            $res = $conexion->query("SELECT MAX(CAST(SUBSTRING(numero_documento, 5) AS UNSIGNED)) as max_num FROM cobro WHERE numero_documento LIKE 'COB-%'");
 
+            $num = 1;
             if ($res && $res->num_rows > 0) {
                 $row = $res->fetch_assoc();
-                if (preg_match('/COB-(\d+)/', $row['numero_documento'], $m))
-                    $num = intval($m[1]) + 1;
-                else
-                    $num = 1;
-            } else $num = 1;
+                $max_num = intval($row['max_num'] ?? 0);
+                $num = $max_num + 1;
+            }
 
             $numero_cobro = "COB-" . str_pad($num, 8, "0", STR_PAD_LEFT);
 
@@ -185,10 +195,14 @@ try {
                 $factura_id = intval($d["factura_id"]);
                 $monto_aplicado = floatval($d["monto_aplicado"]);
 
-                // verificar pendiente correcto
+                // verificar pendiente correcto (considerando devoluciones)
                 $stmtChk = $conexion->prepare("
                     SELECT 
                         f.total - IFNULL((
+                            SELECT SUM(d.total)
+                            FROM devolucion d
+                            WHERE d.factura_id = f.id_facturas AND d.activo = 1
+                        ),0) - IFNULL((
                             SELECT SUM(cd.monto_aplicado)
                             FROM cobro_detalle cd
                             WHERE cd.factura_id = f.id_facturas AND cd.activo = 1
@@ -208,6 +222,35 @@ try {
                 // insertar detalle
                 $stmtDet->bind_param("iid", $cobro_id, $factura_id, $monto_aplicado);
                 $stmtDet->execute();
+
+                // Verificar si la factura está completamente pagada (considerando devoluciones)
+                $stmtVerify = $conexion->prepare("
+                    SELECT 
+                        f.total - IFNULL((
+                            SELECT SUM(d.total)
+                            FROM devolucion d
+                            WHERE d.factura_id = f.id_facturas AND d.activo = 1
+                        ),0) - IFNULL((
+                            SELECT SUM(cd.monto_aplicado)
+                            FROM cobro_detalle cd
+                            WHERE cd.factura_id = f.id_facturas AND cd.activo = 1
+                        ),0) AS pendiente
+                    FROM factura f
+                    WHERE f.id_facturas = ?
+                    LIMIT 1
+                ");
+                $stmtVerify->bind_param("i", $factura_id);
+                $stmtVerify->execute();
+                $resultVerify = $stmtVerify->get_result();
+                $rowVerify = $resultVerify->fetch_assoc();
+                $pendiente_actual = floatval($rowVerify["pendiente"] ?? 0);
+
+                // Si el pendiente es <= 0, cambiar estado a finalizado
+                if ($pendiente_actual <= 0) {
+                    $stmtEstado = $conexion->prepare("UPDATE factura SET estado = 'finalizado' WHERE id_facturas = ?");
+                    $stmtEstado->bind_param("i", $factura_id);
+                    $stmtEstado->execute();
+                }
             }
 
             $conexion->commit();

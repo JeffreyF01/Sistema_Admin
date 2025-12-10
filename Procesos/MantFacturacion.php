@@ -410,9 +410,17 @@ $(document).ready(function() {
                 if (response.success) {
                     let html = '';
                     response.data.forEach(function(factura) {
-                        const estadoBadge = factura.activo == 1
-                            ? '<span class="badge bg-success">Activo</span>'
-                            : '<span class="badge bg-danger">Anulado</span>';
+                        // Badge de estado basado en el campo estado de la BD
+                        let estadoBadge = '';
+                        if (factura.activo == 0) {
+                            estadoBadge = '<span class="badge bg-danger">Anulado</span>';
+                        } else if (factura.estado === 'finalizado') {
+                            estadoBadge = '<span class="badge bg-success">Finalizado</span>';
+                        } else if (factura.estado === 'pendiente') {
+                            estadoBadge = '<span class="badge bg-warning">Pendiente</span>';
+                        } else {
+                            estadoBadge = '<span class="badge bg-secondary">Sin Estado</span>';
+                        }
                         
                         html += `<tr>
                             <td>${factura.numero_documento}</td>
