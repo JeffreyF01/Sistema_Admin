@@ -168,6 +168,14 @@ $(function(){
     let facturas = [];
 
     // ============================
+    // ASIGNAR FECHA AUTOMÁTICA AL ABRIR MODAL
+    // ============================
+    $('#cobroModal').on('show.bs.modal', function() {
+        const hoy = new Date().toISOString().split('T')[0];
+        $('#fecha_cobro').val(hoy);
+    });
+
+    // ============================
     // CARGAR COBROS
     // ============================
     function cargarCobros(){
