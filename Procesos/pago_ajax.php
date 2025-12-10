@@ -12,7 +12,7 @@ switch($accion){
     case "listar":
 
     $sql = "SELECT 
-                p.id_pago,
+                p.id_pagos,
                 p.numero_documento AS numero_pago,
                 pr.nombre AS proveedor,
                 p.fecha AS fecha_pago,
@@ -22,7 +22,7 @@ switch($accion){
             LEFT JOIN proveedor pr ON pr.id_proveedores = p.proveedor_id
             LEFT JOIN usuario u ON u.id_usuarios = p.usuario_id
             WHERE p.activo = 1
-            ORDER BY p.id_pago DESC
+            ORDER BY p.id_pagos DESC
             LIMIT 200";
 
     $res = $conexion->query($sql);
@@ -30,7 +30,7 @@ switch($accion){
     $datos = [];
     while ($row = $res->fetch_assoc()) {
 
-        $pago_id = $row['id_pago'];
+        $pago_id = $row['id_pagos'];
 
         // ===============================
         // BUSCAR EL ESTADO DEL PAGO
