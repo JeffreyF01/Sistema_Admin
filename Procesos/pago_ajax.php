@@ -79,12 +79,16 @@ case "facturasProveedor":
 
     $proveedor_id = intval($data['proveedor_id']);
 
-    $sql = "SELECT c.id_compras, c.numero_documento, c.fecha, 
-                   c.total, cxp.saldo
-            FROM cxp cxp
-            INNER JOIN compra c ON c.id_compras = cxp.compra_id
-            WHERE cxp.proveedor_id = ?
-            AND cxp.saldo > 0 AND cxp.activo = 1";
+        // Solo facturas a crédito: condicion_pago con días de plazo > 0
+        $sql = "SELECT c.id_compras, c.numero_documento, c.fecha, 
+                 c.total, cxp.saldo
+             FROM cxp cxp
+             INNER JOIN compra c ON c.id_compras = cxp.compra_id
+             INNER JOIN condicion_pago cp ON cp.id_condiciones_pago = c.condicion_id
+             WHERE cxp.proveedor_id = ?
+            AND cp.dias_plazo > 0   -- crédito
+            AND cxp.saldo > 0 
+            AND cxp.activo = 1";
 
     $stmt = $conexion->prepare($sql);
     $stmt->bind_param("i", $proveedor_id);
